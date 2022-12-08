@@ -1,3 +1,5 @@
+import { drawCircle } from './util';
+
 export abstract class AnimatedObject {
 
   abstract draw(ctx: CanvasRenderingContext2D): void;
@@ -88,17 +90,4 @@ export class Enemy extends AnimatedObject {
       // Enemy is already small, so remove it
     }
   }
-}
-
-function drawCircle(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  size: number,
-  color: string,
-): void {
-  ctx.beginPath();
-  ctx.arc(x, y, size, 0, Math.PI * 2, false);
-  ctx.fillStyle = color;
-  ctx.fill();
 }

@@ -1,5 +1,6 @@
 import { Enemy, Player, Projectile } from './animatedObjects';
 import { EnemySpawner } from './enemySpawner';
+import { arrayCrossProduct, drawRoundRect } from './util';
 
 // Create canvas
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -13,6 +14,8 @@ class Game {
 
   private lastTimestamp: number = 0;
 
+  private playerAlive: boolean = true;
+  private score: number = 0;
   public projectiles: Projectile[] = [];
   private enemies: Enemy[] = [];
 
@@ -22,54 +25,27 @@ class Game {
     this.enemySpawner = new EnemySpawner(canvas.width, canvas.height, player);
   }
 
-  run() {
-    requestAnimationFrame(this.run.bind(this));
-
-    // Detect collision between player and enemies
-    const playerDead = this.enemies.some(enemy => {
-      const dx = this.player.x - enemy.x;
-      const dy = this.player.y - enemy.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      return distance < this.player.size + enemy.size;
-    });
-    console.log('Dead: ', playerDead ? 'Yes' : 'No');
-
-    // Remove enemies and projectiles that collide
-    const enemiesAndProjectiles = arrayCrossProduct(this.enemies, this.projectiles);
-    enemiesAndProjectiles.forEach(([enemy, projectile]) => {
-      const dx = enemy.x - projectile.x;
-      const dy = enemy.y - projectile.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance < enemy.size + projectile.size) {
-        // Remove enemy and projectile
-        if (enemy.shouldReduceSize()) {
-          enemy.reduceSize();
-        } else {
-          this.enemies = this.enemies.filter(e => e !== enemy);
-        }
-        this.projectiles = this.projectiles.filter(p => p !== projectile);
-      }
-    });
-
+  draw(): void {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (this.enemySpawner.shouldSpawn()) {
-      this.enemies.push(this.enemySpawner.spawn());
-    }
-
-    const dt = (Date.now() - this.lastTimestamp) / 1000;
-
-    // Update and draw objects
     this.player.draw(ctx);
-    this.projectiles.forEach(projectile => {
-      projectile.update(dt);
-      projectile.draw(ctx);
-    });
-    this.enemies.forEach(enemy => {
-      enemy.update(dt);
-      enemy.draw(ctx);
-    });
+    this.projectiles.forEach(projectile => projectile.draw(ctx));
+    this.enemies.forEach(enemy => enemy.draw(ctx));
 
+    // Draw score
+    ctx.font = '24px Arial';
+    ctx.fillStyle = 'black';
+    ctx.fillText(`Score: ${this.score}`, 20, 40);
+
+  }
+
+  update(dt: number): void {
+    this.player.update(dt);
+    this.projectiles.forEach(projectile => projectile.update(dt));
+    this.enemies.forEach(enemy => enemy.update(dt));
+  }
+
+  cleanup(): void {
     // Cleanup enemies that are off screen
     this.enemies = this.enemies.filter(enemy =>
       enemy.x + enemy.size > 0
@@ -85,23 +61,82 @@ class Game {
       && projectile.y + projectile.size > 0
       && projectile.y - projectile.size < canvas.height,
     );
+  }
+
+  spawn(): void {
+    // Run all spawners
+    if (this.enemySpawner.shouldSpawn()) {
+      this.enemies.push(this.enemySpawner.spawn());
+    }
+  }
+
+  run() {
+    requestAnimationFrame(this.run.bind(this));
+
+    if (!this.playerAlive) {
+
+      drawRoundRect(ctx, canvas.width / 2 - 200, canvas.height / 2 - 100, 400, 200, 20);
+
+      ctx.font = '48px Arial';
+      ctx.fillStyle = 'black';
+      ctx.fillText('Game Over', canvas.width / 2 - 150, canvas.height / 2);
+      ctx.font = '24px Arial';
+      ctx.fillText('Click to restart', canvas.width / 2 - 100, canvas.height / 2 + 50);
+
+
+      return;
+    }
+
+
+
+    // Update objects
+    this.update((Date.now() - this.lastTimestamp) / 1000);
+
+    // Detect collision between player and enemies
+    const playerDead = this.enemies.some(enemy => {
+      const dx = this.player.x - enemy.x;
+      const dy = this.player.y - enemy.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      return distance < this.player.size + enemy.size;
+    });
+    this.playerAlive = !playerDead;
+    console.log('Dead: ', playerDead ? 'Yes' : 'No');
+
+    // Remove enemies and projectiles that collide
+    const enemiesAndProjectiles = arrayCrossProduct(this.enemies, this.projectiles);
+    enemiesAndProjectiles.forEach(([enemy, projectile]) => {
+      const dx = enemy.x - projectile.x;
+      const dy = enemy.y - projectile.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance < enemy.size + projectile.size) {
+        this.score += 10;
+        // Remove enemy and projectile
+        if (enemy.shouldReduceSize()) {
+          enemy.reduceSize();
+        } else {
+          this.enemies = this.enemies.filter(e => e !== enemy);
+        }
+        this.projectiles = this.projectiles.filter(p => p !== projectile);
+      }
+    });
+
+    // Cleanup off screen objects
+    this.cleanup();
+
+    // Spawn has to be after cleanup otherwise we will clean up
+    // newly spawned enemies
+    // This may cause bugs in the future if we start cleaning up
+    // before enemies enter the screen
+    this.spawn();
 
     this.lastTimestamp = Date.now();
+
+    // Draw objects
+    this.draw();
   }
 }
 
 let game = new Game(new Player(canvas.width / 2, canvas.height / 2, 50));
-
-function arrayCrossProduct<A, B>(array1: A[], array2: B[]): [A, B][] {
-  const result: [A, B][] = [];
-  for (const item1 of array1) {
-    for (const item2 of array2) {
-      result.push([item1, item2]);
-    }
-  }
-  return result;
-}
-
 
 // Spawn projectiles on mouse click
 canvas.addEventListener('mousedown', (event) => {
