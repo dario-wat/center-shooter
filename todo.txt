@@ -1,4 +1,4 @@
-[] Spawn 3 different enemy sizes
+[x] Spawn 3 different enemy sizes
 [] Collision with projectile and enemy reduces the enemy size
 [] Spawn enemy outside the screen (and with different colors and sizes and velocities)
 [] Scoring system

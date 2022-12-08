@@ -33,7 +33,7 @@ export class Projectile extends AnimatedObject {
     public size: number,
     private velocity: number,
     private angle: number,
-    private color: string = 'green',
+    private color: string = 'black',
   ) {
     super();
   }
@@ -49,6 +49,10 @@ export class Projectile extends AnimatedObject {
 }
 
 export class Enemy extends AnimatedObject {
+
+  public static readonly SMALL_SIZE = 20;
+  public static readonly MEDIUM_SIZE = 35;
+  public static readonly LARGE_SIZE = 50;
 
   constructor(
     public x: number,
@@ -68,6 +72,20 @@ export class Enemy extends AnimatedObject {
   update(dt: number): void {
     this.x += this.velocity * Math.cos(this.angle) * dt;
     this.y += this.velocity * Math.sin(this.angle) * dt;
+  }
+
+  shouldReduceSize(): boolean {
+    return this.size > Enemy.SMALL_SIZE;
+  }
+
+  reduceSize(): void {
+    if (this.size === Enemy.LARGE_SIZE) {
+      this.size = Enemy.MEDIUM_SIZE;
+    } else if (this.size === Enemy.MEDIUM_SIZE) {
+      this.size = Enemy.SMALL_SIZE;
+    } else {
+      // Enemy is already small, so remove it
+    }
   }
 }
 

@@ -8,7 +8,6 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 let mostRecentTimestamp = Date.now();
-let mostRecentEnemySpawn = Date.now();
 
 let player = new Player(canvas.width / 2, canvas.height / 2, 50);
 let projectiles: Projectile[] = [];
@@ -46,7 +45,11 @@ function animate() {
     const distance = Math.sqrt(dx * dx + dy * dy);
     if (distance < enemy.size + projectile.size) {
       // Remove enemy and projectile
-      enemies = enemies.filter(e => e !== enemy);
+      if (enemy.shouldReduceSize()) {
+        enemy.reduceSize();
+      } else {
+        enemies = enemies.filter(e => e !== enemy);
+      }
       projectiles = projectiles.filter(p => p !== projectile);
     }
   });
@@ -93,7 +96,7 @@ function animate() {
 canvas.addEventListener('mousedown', (event) => {
   // New projectile at player position moving towards the mouse click
   const angle = Math.atan2(event.clientY - player.y, event.clientX - player.x);
-  const projectile = new Projectile(player.x, player.y, 5, 100, angle);
+  const projectile = new Projectile(player.x, player.y, 5, 300, angle);
 
   // TODO needs to be cleaned up
   projectiles.push(projectile);

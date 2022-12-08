@@ -6,10 +6,6 @@ const MAX_INTERVAL = 2000;
 const MIN_VELOCITY = 50;
 const MAX_VELOCITY = 200;
 
-const SMALL_SIZE = 10;
-const MEDIUM_SIZE = 15;
-const LARGE_SIZE = 20;
-
 const SMALL_PROBABILITY = 0.5;
 const MEDIUM_PROBABILITY = 0.35;
 const LARGE_PROBABILITY = 0.15;
@@ -72,10 +68,10 @@ export class EnemySpawner {
 function getSize(): number {
   const probability = Math.random();
   if (probability < SMALL_PROBABILITY) {
-    return SMALL_SIZE;
+    return Enemy.SMALL_SIZE;
   }
   if (probability < SMALL_PROBABILITY + MEDIUM_PROBABILITY) {
-    return MEDIUM_SIZE;
+    return Enemy.MEDIUM_SIZE;
   }
-  return LARGE_SIZE;
+  return Enemy.LARGE_SIZE;
 };
