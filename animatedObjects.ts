@@ -10,17 +10,14 @@ export class Player extends AnimatedObject {
   constructor(
     public x: number,
     public y: number,
-    private size: number,
+    public size: number,
     private color: string = '#ababab',
   ) {
     super();
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-    ctx.fillStyle = this.color;
-    ctx.fill();
+    drawCircle(ctx, this.x, this.y, this.size, this.color);
   }
 
   update(_dt: number): void {
@@ -42,10 +39,7 @@ export class Projectile extends AnimatedObject {
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-    ctx.fillStyle = this.color;
-    ctx.fill();
+    drawCircle(ctx, this.x, this.y, this.size, this.color);
   }
 
   update(dt: number): void {
@@ -68,14 +62,24 @@ export class Enemy extends AnimatedObject {
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-    ctx.fillStyle = this.color;
-    ctx.fill();
+    drawCircle(ctx, this.x, this.y, this.size, this.color);
   }
 
   update(dt: number): void {
     this.x += this.velocity * Math.cos(this.angle) * dt;
     this.y += this.velocity * Math.sin(this.angle) * dt;
   }
+}
+
+function drawCircle(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+  color: string,
+): void {
+  ctx.beginPath();
+  ctx.arc(x, y, size, 0, Math.PI * 2, false);
+  ctx.fillStyle = color;
+  ctx.fill();
 }

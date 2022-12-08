@@ -1,4 +1,5 @@
 import { Enemy, Player, Projectile } from './animatedObjects';
+import { EnemySpawner } from './enemySpawner';
 
 // Create canvas
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -13,20 +14,47 @@ let player = new Player(canvas.width / 2, canvas.height / 2, 50);
 let projectiles: Projectile[] = [];
 let enemies: Enemy[] = [];
 
+const enemySpawner = new EnemySpawner(canvas.width, canvas.height, player);
+
+function arrayCrossProduct<A, B>(array1: A[], array2: B[]): [A, B][] {
+  const result: [A, B][] = [];
+  for (const item1 of array1) {
+    for (const item2 of array2) {
+      result.push([item1, item2]);
+    }
+  }
+  return result;
+}
 
 function animate() {
   requestAnimationFrame(animate);
+
+  // Detect collision between player and enemies
+  const playerDead = enemies.some(enemy => {
+    const dx = player.x - enemy.x;
+    const dy = player.y - enemy.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    return distance < player.size + enemy.size;
+  });
+  console.log('Dead: ', playerDead ? 'Yes' : 'No');
+
+  // Remove enemies and projectiles that collide
+  const enemiesAndProjectiles = arrayCrossProduct(enemies, projectiles);
+  enemiesAndProjectiles.forEach(([enemy, projectile]) => {
+    const dx = enemy.x - projectile.x;
+    const dy = enemy.y - projectile.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    if (distance < enemy.size + projectile.size) {
+      // Remove enemy and projectile
+      enemies = enemies.filter(e => e !== enemy);
+      projectiles = projectiles.filter(p => p !== projectile);
+    }
+  });
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Spawn enemies every 1 second
-  if (Date.now() - mostRecentEnemySpawn > 1000) {
-    const x = Math.random() * canvas.width;
-    const y = Math.random() * canvas.height;
-    const angle = Math.atan2(player.y - y, player.x - x);
-    const enemy = new Enemy(x, y, 50, 100, angle);
-
-    enemies.push(enemy);
-    mostRecentEnemySpawn = Date.now();
+  if (enemySpawner.shouldSpawn()) {
+    enemies.push(enemySpawner.spawn());
   }
 
   const dt = (Date.now() - mostRecentTimestamp) / 1000;
