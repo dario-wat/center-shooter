@@ -1,91 +1,74 @@
+import { Enemy, Player, Projectile } from './animatedObjects';
+
 // Create canvas
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-abstract class AnimatedObject {
-
-  abstract draw(): void;
-
-  abstract update(dt: number): void;
-}
-
-class Player extends AnimatedObject {
-
-  constructor(
-    public x: number,
-    public y: number,
-    private size: number,
-    private color: string = '#ababab',
-  ) {
-    super();
-  }
-
-  draw(): void {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-    ctx.fillStyle = this.color;
-    ctx.fill();
-  }
-
-  update(dt: number): void {
-  }
-}
-
-class Projectile extends AnimatedObject {
-
-  constructor(
-    private x: number,
-    private y: number,
-    private size: number,
-    private velocity: number,
-    private angle: number,
-    private color: string = 'red',
-  ) {
-    super();
-  }
-
-  draw(): void {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-    ctx.fillStyle = this.color;
-    ctx.fill();
-  }
-
-  update(dt: number): void {
-    // Move projectile given velocity and angle
-    this.x += this.velocity * Math.cos(this.angle) * dt;
-    this.y += this.velocity * Math.sin(this.angle) * dt;
-  }
-}
-
 let mostRecentTimestamp = Date.now();
+let mostRecentEnemySpawn = Date.now();
 
 let player = new Player(canvas.width / 2, canvas.height / 2, 50);
-
 let projectiles: Projectile[] = [];
-
-// Spawn projectiles on mouse click
-canvas.addEventListener('click', (event) => {
-  // New projectile at player position moving towards the mouse click
-  const angle = Math.atan2(event.clientY - player.y, event.clientX - player.x);
-  const projectile = new Projectile(player.x, player.y, 5, 0.1, angle);
-
-  projectiles.push(projectile);
-});
+let enemies: Enemy[] = [];
 
 
 function animate() {
   requestAnimationFrame(animate);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  player.draw();
-  projectiles.forEach((projectile) => {
-    projectile.update(Date.now() - mostRecentTimestamp);
-    projectile.draw();
+
+  // Spawn enemies every 1 second
+  if (Date.now() - mostRecentEnemySpawn > 1000) {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    const angle = Math.atan2(player.y - y, player.x - x);
+    const enemy = new Enemy(x, y, 50, 100, angle);
+
+    enemies.push(enemy);
+    mostRecentEnemySpawn = Date.now();
+  }
+
+  const dt = (Date.now() - mostRecentTimestamp) / 1000;
+
+  // Update and draw objects
+  player.draw(ctx);
+  projectiles.forEach(projectile => {
+    projectile.update(dt);
+    projectile.draw(ctx);
   });
-  // console.log(Date.now() - mostRecentTimestamp);
+  enemies.forEach(enemy => {
+    enemy.update(dt);
+    enemy.draw(ctx);
+  });
+
+  // Cleanup enemies that are off screen
+  enemies = enemies.filter(enemy =>
+    enemy.x + enemy.size > 0
+    && enemy.x - enemy.size < canvas.width
+    && enemy.y + enemy.size > 0
+    && enemy.y - enemy.size < canvas.height,
+  );
+
+  // Clenaup projectiles that are off screen
+  projectiles = projectiles.filter(projectile =>
+    projectile.x + projectile.size > 0
+    && projectile.x - projectile.size < canvas.width
+    && projectile.y + projectile.size > 0
+    && projectile.y - projectile.size < canvas.height,
+  );
+
   mostRecentTimestamp = Date.now();
 }
+
+// Spawn projectiles on mouse click
+canvas.addEventListener('mousedown', (event) => {
+  // New projectile at player position moving towards the mouse click
+  const angle = Math.atan2(event.clientY - player.y, event.clientX - player.x);
+  const projectile = new Projectile(player.x, player.y, 5, 100, angle);
+
+  // TODO needs to be cleaned up
+  projectiles.push(projectile);
+});
 
 animate();
