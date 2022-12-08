@@ -75,6 +75,7 @@ export class Enemy extends AnimatedObject {
   }
 
   shouldReduceSize(): boolean {
+    // Otherwise it should die
     return this.size > Enemy.SMALL_SIZE;
   }
 
