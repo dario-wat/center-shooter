@@ -38,7 +38,7 @@ class Game {
 
     // Draw score
     ctx.font = '24px Arial';
-    ctx.fillStyle = 'black';
+    ctx.fillStyle = 'white';
     ctx.fillText(`Score: ${this.score}`, 20, 40);
 
   }
@@ -150,12 +150,12 @@ class Game {
 async function main(): Promise<void> {
   await Images.initialize();
 
-  let game = new Game(new Player(canvas.width / 2, canvas.height / 2, 50));
+  let game = new Game(new Player(canvas.width / 2, canvas.height / 2, 50, 0));
 
   // Spawn projectiles on mouse click
   canvas.addEventListener('mousedown', (event) => {
     if (game.gameOver) {
-      game = new Game(new Player(canvas.width / 2, canvas.height / 2, 50));
+      game = new Game(new Player(canvas.width / 2, canvas.height / 2, 50, 0));
       game.run();
       return;
     }
@@ -166,6 +166,12 @@ async function main(): Promise<void> {
 
     game.projectiles.push(projectile);
   });
+
+  // Player faces the mouse position
+  canvas.addEventListener('mousemove', (event) => {
+    game.player.angle = Math.atan2(event.clientY - game.player.y, event.clientX - game.player.x);
+  });
+
 
   game.run();
 }
