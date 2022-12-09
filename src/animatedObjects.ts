@@ -94,7 +94,7 @@ export class Projectile extends AnimatedObject {
   }
 }
 
-export class Enemy extends AnimatedObject {
+export class Meteor extends AnimatedObject {
 
   public static readonly SMALL_SIZE = 20;
   public static readonly MEDIUM_SIZE = 35;
@@ -149,14 +149,14 @@ export class Enemy extends AnimatedObject {
 
   shouldReduceSize(): boolean {
     // Otherwise it should die
-    return this.size > Enemy.SMALL_SIZE;
+    return this.size > Meteor.SMALL_SIZE;
   }
 
   reduceSize(): void {
-    if (this.size === Enemy.LARGE_SIZE) {
-      this.size = Enemy.MEDIUM_SIZE;
-    } else if (this.size === Enemy.MEDIUM_SIZE) {
-      this.size = Enemy.SMALL_SIZE;
+    if (this.size === Meteor.LARGE_SIZE) {
+      this.size = Meteor.MEDIUM_SIZE;
+    } else if (this.size === Meteor.MEDIUM_SIZE) {
+      this.size = Meteor.SMALL_SIZE;
     } else {
       // Enemy is already small, so remove it
     }

@@ -1,5 +1,5 @@
-import { Enemy, Player, Projectile, Smoke } from './animatedObjects';
-import { EnemySpawner } from './enemySpawner';
+import { Meteor, Player, Projectile, Smoke } from './animatedObjects';
+import { MeteorSpawner } from './meteorSpawner';
 import { arrayCrossProduct, drawRoundRect } from './util';
 import Images from './images';
 
@@ -11,7 +11,7 @@ canvas.height = window.innerHeight;
 
 class Game {
 
-  private readonly enemySpawner: EnemySpawner;
+  private readonly meteorSpawner: MeteorSpawner;
 
   private lastTimestamp: number = 0;
 
@@ -19,12 +19,12 @@ class Game {
   public score: number = 0;
   public player: Player
   public projectiles: Projectile[] = [];
-  public enemies: Enemy[] = [];
+  public meteors: Meteor[] = [];
   public smokes: Smoke[] = [];
 
   constructor() {
     this.player = new Player(canvas.width / 2, canvas.height / 2);
-    this.enemySpawner = new EnemySpawner(canvas.width, canvas.height, this.player);
+    this.meteorSpawner = new MeteorSpawner(canvas.width, canvas.height, this.player);
   }
 
   draw(): void {
@@ -35,7 +35,7 @@ class Game {
 
     this.player.draw(ctx);
     this.projectiles.forEach(projectile => projectile.draw(ctx));
-    this.enemies.forEach(enemy => enemy.draw(ctx));
+    this.meteors.forEach(meteor => meteor.draw(ctx));
     this.smokes.forEach(smoke => smoke.draw(ctx));
 
     // Draw score
@@ -48,16 +48,16 @@ class Game {
   update(dt: number): void {
     this.player.update(dt);
     this.projectiles.forEach(projectile => projectile.update(dt));
-    this.enemies.forEach(enemy => enemy.update(dt));
+    this.meteors.forEach(meteor => meteor.update(dt));
   }
 
   cleanup(): void {
-    // Cleanup enemies that are off screen
-    this.enemies = this.enemies.filter(enemy =>
-      enemy.x + enemy.size > 0
-      && enemy.x - enemy.size < canvas.width
-      && enemy.y + enemy.size > 0
-      && enemy.y - enemy.size < canvas.height,
+    // Cleanup meteors that are off screen
+    this.meteors = this.meteors.filter(meteor =>
+      meteor.x + meteor.size > 0
+      && meteor.x - meteor.size < canvas.width
+      && meteor.y + meteor.size > 0
+      && meteor.y - meteor.size < canvas.height,
     );
 
     // Clenaup projectiles that are off screen
@@ -74,39 +74,39 @@ class Game {
 
   spawn(): void {
     // Run all spawners
-    if (this.enemySpawner.shouldSpawn()) {
-      this.enemies.push(this.enemySpawner.spawn());
+    if (this.meteorSpawner.shouldSpawn()) {
+      this.meteors.push(this.meteorSpawner.spawn());
     }
   }
 
   collision(): void {
-    // Detect collision between player and enemies
-    const playerDead = this.enemies.some(enemy => {
-      const dx = this.player.x - enemy.x;
-      const dy = this.player.y - enemy.y;
+    // Detect collision between player and meteors
+    const playerDead = this.meteors.some(meteor => {
+      const dx = this.player.x - meteor.x;
+      const dy = this.player.y - meteor.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
-      return distance < this.player.size + enemy.size;
+      return distance < this.player.size + meteor.size;
     });
     this.gameOver = playerDead;
 
-    // Detect collision between enemies and projectiles
-    const enemiesAndProjectiles = arrayCrossProduct(this.enemies, this.projectiles);
-    enemiesAndProjectiles.forEach(([enemy, projectile]) => {
-      const dx = enemy.x - projectile.x;
-      const dy = enemy.y - projectile.y;
+    // Detect collision between meteors and projectiles
+    const meteorsAndProjectiles = arrayCrossProduct(this.meteors, this.projectiles);
+    meteorsAndProjectiles.forEach(([meteor, projectile]) => {
+      const dx = meteor.x - projectile.x;
+      const dy = meteor.y - projectile.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      if (distance < enemy.size + projectile.size) {
-        // If the projectile hits the enemy increase the score
+      if (distance < meteor.size + projectile.size) {
+        // If the projectile hits the meteor increase the score
         this.score += 10;
 
-        // Remove or downsize the enemy
-        if (enemy.shouldReduceSize()) {
-          enemy.reduceSize();
+        // Remove or downsize the meteor
+        if (meteor.shouldReduceSize()) {
+          meteor.reduceSize();
         } else {
-          // Add smoke where the enemy was
-          this.smokes.push(new Smoke(enemy.x, enemy.y));
-          this.enemies = this.enemies.filter(e => e !== enemy);
+          // Add smoke where the meteor was
+          this.smokes.push(new Smoke(meteor.x, meteor.y));
+          this.meteors = this.meteors.filter(m => m !== meteor);
         }
 
         // Remove the projectile
@@ -142,9 +142,9 @@ class Game {
     this.cleanup();
 
     // Spawn has to be after cleanup otherwise we will clean up
-    // newly spawned enemies
+    // newly spawned meteors
     // This may cause bugs in the future if we start cleaning up
-    // before enemies enter the screen
+    // before meteors enter the screen
     this.spawn();
 
     // Draw objects

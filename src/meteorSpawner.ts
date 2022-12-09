@@ -1,4 +1,4 @@
-import { Enemy, Player } from './animatedObjects';
+import { Meteor, Player } from './animatedObjects';
 
 const MIN_INTERVAL = 500;
 const MAX_INTERVAL = 2000;
@@ -12,7 +12,7 @@ const LARGE_PROBABILITY = 0.15;
 
 const COLORS = ['red', 'blue', 'green', 'yellow'];
 
-export class EnemySpawner {
+export class MeteorSpawner {
 
   private lastSpawnTimestamp: number = 0;
   private nextSpawnInterval: number = 0;
@@ -28,7 +28,7 @@ export class EnemySpawner {
     return Date.now() - this.lastSpawnTimestamp > this.nextSpawnInterval;
   }
 
-  spawn(): Enemy {
+  spawn(): Meteor {
     const color = COLORS[Math.floor(Math.random() * COLORS.length)];
     const velocity = Math.random() * (MAX_VELOCITY - MIN_VELOCITY) + MIN_VELOCITY;
     const size = getSize();
@@ -61,17 +61,17 @@ export class EnemySpawner {
     this.lastSpawnTimestamp = Date.now();
     this.nextSpawnInterval = Math.random() * (MAX_INTERVAL - MIN_INTERVAL) + MIN_INTERVAL;
 
-    return new Enemy(x, y, size, velocity, angle);
+    return new Meteor(x, y, size, velocity, angle);
   }
 }
 
 function getSize(): number {
   const probability = Math.random();
   if (probability < SMALL_PROBABILITY) {
-    return Enemy.SMALL_SIZE;
+    return Meteor.SMALL_SIZE;
   }
   if (probability < SMALL_PROBABILITY + MEDIUM_PROBABILITY) {
-    return Enemy.MEDIUM_SIZE;
+    return Meteor.MEDIUM_SIZE;
   }
-  return Enemy.LARGE_SIZE;
+  return Meteor.LARGE_SIZE;
 };
