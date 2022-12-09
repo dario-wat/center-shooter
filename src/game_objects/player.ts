@@ -1,4 +1,4 @@
-import { drawCircle } from '../util';
+import { drawCircle, euclDistance } from '../util';
 import Images from '../images';
 import { DEBUG_COLLISIONS } from '../config';
 import { AnimatedObject } from './animatedObject';
@@ -67,14 +67,13 @@ export class Player extends AnimatedObject {
     return this.activeWeapon === WeaponType.PROJECTILE;
   }
 
+  isLaserFiring(): boolean {
+    return this.isLaserEquipped() && this.laser.isActive;
+  }
+
   // Spawns new projectile in the direction where the player is facing
-  fireProjectile(velocity: number): Projectile {
-    return new Projectile(
-      this.x,
-      this.y,
-      velocity,
-      this.angle,
-    );
+  fireProjectile(): Projectile {
+    return new Projectile(this.x, this.y, this.angle);
   }
 }
 
@@ -83,8 +82,8 @@ export class Projectile extends AnimatedObject {
   constructor(
     public x: number,
     public y: number,
-    private velocity: number,
     private angle: number,
+    private velocity: number = 300,
     public size: number = 10,
   ) {
     super();
@@ -145,11 +144,8 @@ export class Laser extends AnimatedObject {
     ctx.rotate(this.player.angle - Math.PI / 2);
 
     // Draw laser to the edge of the screen or to the hit point
-    const laserLength = this.hit ?
-      Math.sqrt(
-        Math.pow(this.hit.x - this.player.x, 2) +
-        Math.pow(this.hit.y - this.player.y, 2),
-      )
+    const laserLength = this.hit
+      ? euclDistance(this.hit.x, this.hit.y, this.player.x, this.player.y)
       : 1000;
     const laserWidth = 10;
     ctx.drawImage(

@@ -68,7 +68,7 @@ export function intersectRayAndCircle(
   circleX: number,
   circleY: number,
   circleRadius: number,
-): [number, number] | null {
+): { x: number, y: number } | null {
   const lineEndX = lineStartX + 1000 * Math.cos(lineAngle);
   const lineEndY = lineStartY + 1000 * Math.sin(lineAngle);
 
@@ -90,8 +90,12 @@ export function intersectRayAndCircle(
   const t2 = (-f - Math.sqrt(discriminant)) / (2 * e);
 
   if (t1 >= 0 && t1 <= 1 || t2 >= 0 && t2 <= 1) {
-    return [lineStartX + a * t2, lineStartY + c * t2];
+    return { x: lineStartX + a * t2, y: lineStartY + c * t2 };
   }
 
   return null;
+}
+
+export function euclDistance(x1: number, y1: number, x2: number, y2: number): number {
+  return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
 }

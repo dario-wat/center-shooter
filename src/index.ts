@@ -1,7 +1,7 @@
 import { Meteor, Smoke } from './game_objects/gameObjects';
 import { Laser, LaserHit, Player, Projectile } from './game_objects/player';
 import { MeteorSpawner } from './meteorSpawner';
-import { arrayCrossProduct, drawRoundRect, intersectRayAndCircle } from './util';
+import { arrayCrossProduct, drawRoundRect, euclDistance, intersectRayAndCircle } from './util';
 import Images from './images';
 
 // Create canvas
@@ -119,20 +119,21 @@ class Game {
 
 
     // Collision between laser and meteors
-    // TODO closest one
     this.player.laser.hit = null;
-    if (this.player.isLaserEquipped() && this.player.laser.isActive) {
+    let distanceToMeteor = Infinity;
+    if (this.player.isLaserFiring()) {
       this.meteors.forEach(meteor => {
         // Circle and line intersection
-        if (this.player.laser.hit !== null) {
-          return;
-        }
         const intersection = intersectRayAndCircle(
           this.player.x, this.player.y, this.player.angle,
           meteor.x, meteor.y, meteor.size,
         );
         if (intersection !== null) {
-          this.player.laser.hit = new LaserHit(intersection[0], intersection[1]);
+          const distance = euclDistance(this.player.x, this.player.y, intersection.x, intersection.y);
+          if (distance < distanceToMeteor) {
+            this.player.laser.hit = new LaserHit(intersection.x, intersection.y);
+            distanceToMeteor = distance;
+          }
         }
       });
     }
@@ -209,7 +210,7 @@ async function main(): Promise<void> {
 
     // New projectile at player position moving towards the mouse click
     if (game.player.isProjectileEquipped()) {
-      const projectile = game.player.fireProjectile(300);
+      const projectile = game.player.fireProjectile();
       game.projectiles.push(projectile);
     }
   });
