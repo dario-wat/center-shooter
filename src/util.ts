@@ -58,3 +58,40 @@ export function drawRoundRect(
     ctx.stroke();
   }
 }
+
+// Finds an intersection between a ray and a circle and returns the closest
+// intersection point. If there is no intersection, returns null.
+export function intersectRayAndCircle(
+  lineStartX: number,
+  lineStartY: number,
+  lineAngle: number,
+  circleX: number,
+  circleY: number,
+  circleRadius: number,
+): [number, number] | null {
+  const lineEndX = lineStartX + 1000 * Math.cos(lineAngle);
+  const lineEndY = lineStartY + 1000 * Math.sin(lineAngle);
+
+  const a = lineEndX - lineStartX;
+  const b = lineStartX - circleX;
+  const c = lineEndY - lineStartY;
+  const d = lineStartY - circleY;
+
+  const e = a * a + c * c;
+  const f = 2 * (a * b + c * d);
+  const g = b * b + d * d - circleRadius * circleRadius;
+
+  const discriminant = f * f - 4 * e * g;
+  if (discriminant < 0) {
+    return null;
+  }
+
+  const t1 = (-f + Math.sqrt(discriminant)) / (2 * e);
+  const t2 = (-f - Math.sqrt(discriminant)) / (2 * e);
+
+  if (t1 >= 0 && t1 <= 1 || t2 >= 0 && t2 <= 1) {
+    return [lineStartX + a * t2, lineStartY + c * t2];
+  }
+
+  return null;
+}

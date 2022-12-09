@@ -1,7 +1,7 @@
 import { Meteor, Smoke } from './game_objects/gameObjects';
-import { Laser, Player, Projectile } from './game_objects/player';
+import { Laser, LaserHit, Player, Projectile } from './game_objects/player';
 import { MeteorSpawner } from './meteorSpawner';
-import { arrayCrossProduct, drawRoundRect } from './util';
+import { arrayCrossProduct, drawRoundRect, intersectRayAndCircle } from './util';
 import Images from './images';
 
 // Create canvas
@@ -36,16 +36,15 @@ class Game {
     ctx.fillStyle = '#202020';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    this.player.draw(ctx);
     this.projectiles.forEach(projectile => projectile.draw(ctx));
     this.meteors.forEach(meteor => meteor.draw(ctx));
     this.smokes.forEach(smoke => smoke.draw(ctx));
+    this.player.draw(ctx);
 
     // Draw score
     ctx.font = '24px Arial';
     ctx.fillStyle = 'white';
     ctx.fillText(`Score: ${this.score}`, 20, 40);
-
   }
 
   update(dt: number): void {
@@ -119,7 +118,23 @@ class Game {
     });
 
 
-    // TODO collision with laser
+    // Collision between laser and meteors
+    this.player.laser.hit = null;
+    if (this.player.isLaserEquipped() && this.player.laser.isActive) {
+      this.meteors.forEach(meteor => {
+        // Circle and line intersection
+        if (this.player.laser.hit !== null) {
+          return;
+        }
+        const intersection = intersectRayAndCircle(
+          this.player.x, this.player.y, this.player.angle,
+          meteor.x, meteor.y, meteor.size,
+        );
+        if (intersection !== null) {
+          this.player.laser.hit = new LaserHit(intersection[0], intersection[1]);
+        }
+      });
+    }
   }
 
   run() {
@@ -168,6 +183,9 @@ async function main(): Promise<void> {
 
   // Activate laser while mouse is down
   canvas.addEventListener('mousedown', (event) => {
+    if (event.button === 2) {
+      return;
+    }
     if (game.player.isLaserEquipped()) {
       game.player.laser.isActive = true;
     }
@@ -178,11 +196,15 @@ async function main(): Promise<void> {
 
   // Spawn projectiles on mouse click
   canvas.addEventListener('mousedown', (event) => {
-    if (game.gameOver) {
-      game = new Game();
-      game.run();
+    // Ignore right click
+    if (event.button === 2) {
       return;
     }
+    // if (game.gameOver) {
+    //   game = new Game();
+    //   game.run();
+    //   return;
+    // }
 
     // New projectile at player position moving towards the mouse click
     if (game.player.isProjectileEquipped()) {

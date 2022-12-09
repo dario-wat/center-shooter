@@ -1,4 +1,5 @@
 [] Multiple weapon types
+[] Laser collisions and damage
 [] Weapon upgrades
 [] Game becomes more difficult over time
 [] Special upgrades (one time use)

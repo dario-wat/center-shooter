@@ -130,6 +130,7 @@ export class Projectile extends AnimatedObject {
 export class Laser extends AnimatedObject {
 
   public isActive: boolean = false;
+  public hit: LaserHit | null = null;
 
   constructor(private player: Player) {
     super();
@@ -157,9 +158,36 @@ export class Laser extends AnimatedObject {
     ctx.rotate(-this.player.angle + Math.PI / 2);
     ctx.translate(-this.player.x, -this.player.y);
 
+    this.hit?.draw(ctx);
   }
 
-  update(_dt: number): void {
+  update(dt: number): void {
+    // Do nothing for laser, update the laser hit
+    this.hit?.update(dt);
+  }
+}
+
+export class LaserHit extends AnimatedObject {
+
+  constructor(
+    public x: number,
+    public y: number,
+    public size: number = 20,
+  ) {
+    super();
+  }
+
+  draw(ctx: CanvasRenderingContext2D): void {
+    ctx.drawImage(
+      Images.LASER_HIT,
+      this.x - this.size,
+      this.y - this.size,
+      this.size * 2,
+      this.size * 2,
+    );
+  }
+
+  update(dt: number): void {
     // Do nothing
   }
 }
