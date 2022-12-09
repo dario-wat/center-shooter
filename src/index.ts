@@ -1,5 +1,5 @@
-import { Laser, Meteor, Projectile, Smoke } from './game_objects/gameObjects';
-import { Player } from './game_objects/player';
+import { Laser, Meteor, Smoke } from './game_objects/gameObjects';
+import { Player, Projectile } from './game_objects/player';
 import { MeteorSpawner } from './meteorSpawner';
 import { arrayCrossProduct, drawRoundRect } from './util';
 import Images from './images';
@@ -185,8 +185,7 @@ async function main(): Promise<void> {
     }
 
     // New projectile at player position moving towards the mouse click
-    const angle = Math.atan2(event.clientY - game.player.y, event.clientX - game.player.x);
-    const projectile = new Projectile(game.player.x, game.player.y, 300, angle);
+    const projectile = game.player.fireProjectile(300);
     game.projectiles.push(projectile);
   });
 
