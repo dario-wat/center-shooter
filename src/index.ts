@@ -1,5 +1,5 @@
-import { Laser, Meteor, Smoke } from './game_objects/gameObjects';
-import { Player, Projectile } from './game_objects/player';
+import { Meteor, Smoke } from './game_objects/gameObjects';
+import { Laser, Player, Projectile } from './game_objects/player';
 import { MeteorSpawner } from './meteorSpawner';
 import { arrayCrossProduct, drawRoundRect } from './util';
 import Images from './images';
@@ -19,14 +19,12 @@ class Game {
   public gameOver: boolean = false;
   public score: number = 0;
   public player: Player;
-  public laser: Laser;
   public projectiles: Projectile[] = [];
   public meteors: Meteor[] = [];
   public smokes: Smoke[] = [];
 
   constructor() {
     this.player = new Player(canvas.width / 2, canvas.height / 2);
-    this.laser = new Laser(this.player);
     this.meteorSpawner = new MeteorSpawner(canvas.width, canvas.height, this.player);
   }
 
@@ -40,7 +38,6 @@ class Game {
     this.projectiles.forEach(projectile => projectile.draw(ctx));
     this.meteors.forEach(meteor => meteor.draw(ctx));
     this.smokes.forEach(smoke => smoke.draw(ctx));
-    this.laser.draw(ctx);
 
     // Draw score
     ctx.font = '24px Arial';
@@ -54,7 +51,6 @@ class Game {
     this.projectiles.forEach(projectile => projectile.update(dt));
     this.meteors.forEach(meteor => meteor.update(dt));
     this.smokes.forEach(smoke => smoke.update(dt));
-    this.laser.update(dt);
   }
 
   cleanup(): void {
@@ -170,10 +166,10 @@ async function main(): Promise<void> {
 
   // Activate laser while mouse is down
   canvas.addEventListener('mousedown', (event) => {
-    // game.laser.isActive = true;
+    game.player.laser.isActive = true;
   });
   canvas.addEventListener('mouseup', (event) => {
-    game.laser.isActive = false;
+    game.player.laser.isActive = false;
   });
 
   // Spawn projectiles on mouse click

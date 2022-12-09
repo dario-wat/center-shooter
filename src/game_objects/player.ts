@@ -5,6 +5,8 @@ import { AnimatedObject } from './animatedObject';
 
 export class Player extends AnimatedObject {
 
+  public laser: Laser;
+
   constructor(
     public x: number,
     public y: number,
@@ -12,6 +14,7 @@ export class Player extends AnimatedObject {
     public angle: number = 0,
   ) {
     super();
+    this.laser = new Laser(this);
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
@@ -32,10 +35,13 @@ export class Player extends AnimatedObject {
     if (DEBUG_COLLISIONS) {
       drawCircle(ctx, this.x, this.y, this.size, null, 'blue');
     }
+
+    this.laser.draw(ctx);
   }
 
-  update(_dt: number): void {
-    // Do nothing
+  update(dt: number): void {
+    // Player has no updates so only update the laser
+    this.laser.update(dt);
   }
 
   // Spawns new projectile in the direction where the player is facing
@@ -95,5 +101,42 @@ export class Projectile extends AnimatedObject {
   update(dt: number): void {
     this.x += this.velocity * Math.cos(this.angle) * dt;
     this.y += this.velocity * Math.sin(this.angle) * dt;
+  }
+}
+
+export class Laser extends AnimatedObject {
+
+  public isActive: boolean = false;
+
+  constructor(private player: Player) {
+    super();
+  }
+
+  draw(ctx: CanvasRenderingContext2D): void {
+    if (!this.isActive) {
+      return;
+    }
+
+    ctx.translate(this.player.x, this.player.y);
+    ctx.rotate(this.player.angle - Math.PI / 2);
+
+    // Draw laser to the edge of the screen
+    const laserLength = 1000;
+    const laserWidth = 10;
+    ctx.drawImage(
+      Images.LASER,
+      -5,   // No clue why, but need this to center the laser
+      this.player.size,
+      laserWidth,
+      this.player.size + laserLength,
+    );
+
+    ctx.rotate(-this.player.angle + Math.PI / 2);
+    ctx.translate(-this.player.x, -this.player.y);
+
+  }
+
+  update(_dt: number): void {
+    // Do nothing
   }
 }

@@ -1,45 +1,5 @@
-import { drawCircle } from '../util';
 import Images from '../images';
-import { DEBUG_COLLISIONS } from '../config';
 import { AnimatedObject } from './animatedObject';
-import { Player } from './player';
-
-export class Laser extends AnimatedObject {
-
-  public isActive: boolean = false;
-
-  constructor(private player: Player) {
-    super();
-  }
-
-  draw(ctx: CanvasRenderingContext2D): void {
-    if (!this.isActive) {
-      return;
-    }
-
-    ctx.translate(this.player.x, this.player.y);
-    ctx.rotate(this.player.angle - Math.PI / 2);
-
-    // Draw laser to the edge of the screen
-    const laserLength = 1000;
-    const laserWidth = 10;
-    ctx.drawImage(
-      Images.LASER,
-      -5,   // No clue why, but need this to center the laser
-      this.player.size,
-      laserWidth,
-      this.player.size + laserLength,
-    );
-
-    ctx.rotate(-this.player.angle + Math.PI / 2);
-    ctx.translate(-this.player.x, -this.player.y);
-
-  }
-
-  update(_dt: number): void {
-    // Do nothing
-  }
-}
 
 export class Meteor extends AnimatedObject {
 
