@@ -1,5 +1,6 @@
 import { drawCircle } from './util';
 import Images from './images';
+import { DEBUG_COLLISIONS } from './config';
 
 export abstract class AnimatedObject {
 
@@ -27,8 +28,9 @@ export class Player extends AnimatedObject {
       2 * this.size,
     );
 
-    // Debug
-    drawCircle(ctx, this.x, this.y, this.size, null, 'blue');
+    if (DEBUG_COLLISIONS) {
+      drawCircle(ctx, this.x, this.y, this.size, null, 'blue');
+    }
   }
 
   update(_dt: number): void {
@@ -51,18 +53,32 @@ export class Projectile extends AnimatedObject {
   draw(ctx: CanvasRenderingContext2D): void {
     ctx.translate(this.x, this.y);
     ctx.rotate(this.angle + Math.PI / 2);
+
+    const scaleProjectileHoriz = 0.8;
     ctx.drawImage(
       Images.PROJECTILE,
-      -this.size * 0.8,
+      -this.size * scaleProjectileHoriz,
       -this.size,
-      this.size * 1.6,
+      this.size * 2.0 * scaleProjectileHoriz,
       this.size * 2.0,
     );
+
+    const scaleTrailHoriz = 0.6;
+    const scaleTrailVert = 1.5;
+    ctx.drawImage(
+      Images.PROJECTILE_TRAIL,
+      -this.size * scaleTrailHoriz,
+      this.size,
+      this.size * 2.0 * scaleTrailHoriz,
+      this.size * 2.0 * scaleTrailVert,
+    );
+
     ctx.rotate(-this.angle - Math.PI / 2);
     ctx.translate(-this.x, -this.y);
 
-    // Debug  
-    drawCircle(ctx, this.x, this.y, this.size, null, 'red');
+    if (DEBUG_COLLISIONS) {
+      drawCircle(ctx, this.x, this.y, this.size, null, 'red');
+    }
   }
 
   update(dt: number): void {

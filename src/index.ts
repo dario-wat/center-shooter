@@ -29,6 +29,9 @@ class Game {
   draw(): void {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    ctx.fillStyle = '#202020';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     this.player.draw(ctx);
     this.projectiles.forEach(projectile => projectile.draw(ctx));
     this.enemies.forEach(enemy => enemy.draw(ctx));
@@ -108,19 +111,19 @@ class Game {
   run() {
     requestAnimationFrame(this.run.bind(this));
 
-    if (this.gameOver) {
+    // if (this.gameOver) {
 
-      drawRoundRect(ctx, canvas.width / 2 - 200, canvas.height / 2 - 100, 400, 200, 20);
+    //   drawRoundRect(ctx, canvas.width / 2 - 200, canvas.height / 2 - 100, 400, 200, 20);
 
-      ctx.font = '48px Arial';
-      ctx.fillStyle = 'black';
-      ctx.fillText('Game Over', canvas.width / 2 - 150, canvas.height / 2);
-      ctx.font = '24px Arial';
-      ctx.fillText('Click to restart', canvas.width / 2 - 100, canvas.height / 2 + 50);
+    //   ctx.font = '48px Arial';
+    //   ctx.fillStyle = 'black';
+    //   ctx.fillText('Game Over', canvas.width / 2 - 150, canvas.height / 2);
+    //   ctx.font = '24px Arial';
+    //   ctx.fillText('Click to restart', canvas.width / 2 - 100, canvas.height / 2 + 50);
 
 
-      return;
-    }
+    //   return;
+    // }
 
     // Update objects
     this.update((Date.now() - this.lastTimestamp) / 1000);
