@@ -5,6 +5,10 @@ import smoke1Image from '../assets/spaceEffects_013.png';
 import smoke2Image from '../assets/spaceEffects_014.png';
 import smoke3Image from '../assets/spaceEffects_015.png';
 import smoke4Image from '../assets/spaceEffects_016.png';
+import meteor1Image from '../assets/spaceMeteors_001.png';
+import meteor2Image from '../assets/spaceMeteors_002.png';
+import meteor3Image from '../assets/spaceMeteors_003.png';
+import meteor4Image from '../assets/spaceMeteors_004.png';
 
 async function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -24,14 +28,36 @@ export default class Images {
   public static SMOKE_2: HTMLImageElement;
   public static SMOKE_3: HTMLImageElement;
   public static SMOKE_4: HTMLImageElement;
+  public static METEOR_1: HTMLImageElement;
+  public static METEOR_2: HTMLImageElement;
+  public static METEOR_3: HTMLImageElement;
+  public static METEOR_4: HTMLImageElement;
 
   public static async initialize(): Promise<void> {
-    Images.SHIP = await loadImage(shipImage);
-    Images.PROJECTILE = await loadImage(projectileImage);
-    Images.PROJECTILE_TRAIL = await loadImage(projectileTrailImage);
-    Images.SMOKE_1 = await loadImage(smoke1Image);
-    Images.SMOKE_2 = await loadImage(smoke2Image);
-    Images.SMOKE_3 = await loadImage(smoke3Image);
-    Images.SMOKE_4 = await loadImage(smoke4Image);
+    [
+      Images.SHIP,
+      Images.PROJECTILE,
+      Images.PROJECTILE_TRAIL,
+      Images.SMOKE_1,
+      Images.SMOKE_2,
+      Images.SMOKE_3,
+      Images.SMOKE_4,
+      Images.METEOR_1,
+      Images.METEOR_2,
+      Images.METEOR_3,
+      Images.METEOR_4,
+    ] = await Promise.all([
+      loadImage(shipImage),
+      loadImage(projectileImage),
+      loadImage(projectileTrailImage),
+      loadImage(smoke1Image),
+      loadImage(smoke2Image),
+      loadImage(smoke3Image),
+      loadImage(smoke4Image),
+      loadImage(meteor1Image),
+      loadImage(meteor2Image),
+      loadImage(meteor3Image),
+      loadImage(meteor4Image),
+    ]);
   }
 }

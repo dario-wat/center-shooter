@@ -61,7 +61,7 @@ export class EnemySpawner {
     this.lastSpawnTimestamp = Date.now();
     this.nextSpawnInterval = Math.random() * (MAX_INTERVAL - MIN_INTERVAL) + MIN_INTERVAL;
 
-    return new Enemy(x, y, size, velocity, angle, color);
+    return new Enemy(x, y, size, velocity, angle);
   }
 }
 

@@ -1,7 +1,6 @@
-[x] Spawn 3 different enemy sizes
-[x] Collision with projectile and enemy reduces the enemy size
-[x] Spawn enemy outside the screen (and with different colors and sizes and velocities)
-[] Scoring system
-[] End of the game
-[] Spawn projectiles at the edge of the player
-[] Render a gun at the edge of the player
+[] Multiple weapon types
+[] Weapon upgrades
+[] Game becomes more difficult over time
+[] Special upgrades (one time use)
+[] Background space
+[] More intelligent enemies

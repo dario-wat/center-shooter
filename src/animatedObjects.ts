@@ -100,19 +100,46 @@ export class Enemy extends AnimatedObject {
   public static readonly MEDIUM_SIZE = 35;
   public static readonly LARGE_SIZE = 50;
 
+  private meteorType: number;  // 0, 1, 2, 3
+
   constructor(
     public x: number,
     public y: number,
     public size: number,
     private velocity: number,
     private angle: number,
-    private color: string = 'red',
   ) {
     super();
+    this.meteorType = Math.floor(Math.random() * 4);
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
-    drawCircle(ctx, this.x, this.y, this.size, this.color);
+    let meteorImage: HTMLImageElement;
+    switch (this.meteorType) {
+      case 0:
+        meteorImage = Images.METEOR_1;
+        break;
+      case 1:
+        meteorImage = Images.METEOR_2;
+        break;
+      case 2:
+        meteorImage = Images.METEOR_3;
+        break;
+      case 3:
+        meteorImage = Images.METEOR_4;
+        break;
+      default:
+        meteorImage = Images.METEOR_1;
+        break;
+    }
+
+    ctx.drawImage(
+      meteorImage,
+      this.x - this.size,
+      this.y - this.size,
+      this.size * 2,
+      this.size * 2,
+    );
   }
 
   update(dt: number): void {
