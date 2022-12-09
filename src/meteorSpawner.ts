@@ -1,4 +1,5 @@
-import { Meteor, Player } from './animatedObjects';
+import { Meteor } from './game_objects/gameObjects';
+import { Player } from './game_objects/player';
 
 const MIN_INTERVAL = 500;
 const MAX_INTERVAL = 2000;

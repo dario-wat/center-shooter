@@ -1,4 +1,5 @@
-import { Laser, Meteor, Player, Projectile, Smoke } from './animatedObjects';
+import { Laser, Meteor, Projectile, Smoke } from './game_objects/gameObjects';
+import { Player } from './game_objects/player';
 import { MeteorSpawner } from './meteorSpawner';
 import { arrayCrossProduct, drawRoundRect } from './util';
 import Images from './images';
