@@ -3,7 +3,14 @@ import Images from '../images';
 import { DEBUG_COLLISIONS } from '../config';
 import { AnimatedObject } from './animatedObject';
 
+enum WeaponType {
+  LASER,
+  PROJECTILE,
+}
+
 export class Player extends AnimatedObject {
+
+  private activeWeapon: WeaponType = WeaponType.PROJECTILE;
 
   public laser: Laser;
 
@@ -42,6 +49,22 @@ export class Player extends AnimatedObject {
   update(dt: number): void {
     // Player has no updates so only update the laser
     this.laser.update(dt);
+  }
+
+  changeWeapon(): void {
+    if (this.activeWeapon === WeaponType.PROJECTILE) {
+      this.activeWeapon = WeaponType.LASER;
+    } else {
+      this.activeWeapon = WeaponType.PROJECTILE;
+    }
+  }
+
+  isLaserEquipped(): boolean {
+    return this.activeWeapon === WeaponType.LASER;
+  }
+
+  isProjectileEquipped(): boolean {
+    return this.activeWeapon === WeaponType.PROJECTILE;
   }
 
   // Spawns new projectile in the direction where the player is facing

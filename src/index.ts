@@ -18,6 +18,8 @@ class Game {
 
   public gameOver: boolean = false;
   public score: number = 0;
+
+  // Game objects in the scene
   public player: Player;
   public projectiles: Projectile[] = [];
   public meteors: Meteor[] = [];
@@ -166,7 +168,9 @@ async function main(): Promise<void> {
 
   // Activate laser while mouse is down
   canvas.addEventListener('mousedown', (event) => {
-    game.player.laser.isActive = true;
+    if (game.player.isLaserEquipped()) {
+      game.player.laser.isActive = true;
+    }
   });
   canvas.addEventListener('mouseup', (event) => {
     game.player.laser.isActive = false;
@@ -181,8 +185,10 @@ async function main(): Promise<void> {
     }
 
     // New projectile at player position moving towards the mouse click
-    const projectile = game.player.fireProjectile(300);
-    game.projectiles.push(projectile);
+    if (game.player.isProjectileEquipped()) {
+      const projectile = game.player.fireProjectile(300);
+      game.projectiles.push(projectile);
+    }
   });
 
   // Player faces the mouse position
@@ -190,6 +196,11 @@ async function main(): Promise<void> {
     game.player.angle = Math.atan2(event.clientY - game.player.y, event.clientX - game.player.x);
   });
 
+  // Change weapon on right click
+  canvas.addEventListener('contextmenu', (event) => {
+    event.preventDefault();
+    game.player.changeWeapon();
+  });
 
   game.run();
 }
