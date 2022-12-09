@@ -1,7 +1,7 @@
 import { Enemy, Player, Projectile } from './animatedObjects';
 import { EnemySpawner } from './enemySpawner';
 import { arrayCrossProduct, drawRoundRect } from './util';
-
+import Images from './images';
 
 // Create canvas
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -142,21 +142,29 @@ class Game {
   }
 }
 
-let game = new Game(new Player(canvas.width / 2, canvas.height / 2, 50));
 
-// Spawn projectiles on mouse click
-canvas.addEventListener('mousedown', (event) => {
-  if (game.gameOver) {
-    game = new Game(new Player(canvas.width / 2, canvas.height / 2, 50));
-    game.run();
-    return;
-  }
 
-  // New projectile at player position moving towards the mouse click
-  const angle = Math.atan2(event.clientY - game.player.y, event.clientX - game.player.x);
-  const projectile = new Projectile(game.player.x, game.player.y, 5, 300, angle);
+async function main(): Promise<void> {
+  await Images.initialize();
 
-  game.projectiles.push(projectile);
-});
+  let game = new Game(new Player(canvas.width / 2, canvas.height / 2, 50));
 
-game.run();
+  // Spawn projectiles on mouse click
+  canvas.addEventListener('mousedown', (event) => {
+    if (game.gameOver) {
+      game = new Game(new Player(canvas.width / 2, canvas.height / 2, 50));
+      game.run();
+      return;
+    }
+
+    // New projectile at player position moving towards the mouse click
+    const angle = Math.atan2(event.clientY - game.player.y, event.clientX - game.player.x);
+    const projectile = new Projectile(game.player.x, game.player.y, 10, 300, angle);
+
+    game.projectiles.push(projectile);
+  });
+
+  game.run();
+}
+
+main();

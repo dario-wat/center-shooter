@@ -1,6 +1,5 @@
 import { drawCircle } from './util';
-
-import ship from '../assets/spaceShips_007.png';
+import Images from './images';
 
 export abstract class AnimatedObject {
 
@@ -11,25 +10,17 @@ export abstract class AnimatedObject {
 
 export class Player extends AnimatedObject {
 
-  private sprite: HTMLImageElement;
-
   constructor(
     public x: number,
     public y: number,
     public size: number,
   ) {
     super();
-    // TODO await
-    this.loadImage();
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
-    // drawCircle(ctx, this.x, this.y, this.size, this.color);
-    if (!this.sprite) {
-      return;
-    }
     ctx.drawImage(
-      this.sprite,
+      Images.SHIP,
       this.x - this.size,
       this.y - this.size,
       2 * this.size,
@@ -39,16 +30,6 @@ export class Player extends AnimatedObject {
 
   update(_dt: number): void {
     // Do nothing
-  }
-
-  loadImage(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.sprite = new Image();
-      this.sprite.onload = () => resolve();
-      this.sprite.onerror = () => reject();
-      this.sprite.src = 'https://img.favpng.com/2/21/25/spaceshiptwo-spacecraft-sprite-spaceshipone-portable-network-graphics-png-favpng-rrk1zrdCAcwz6C86q05B28r18.jpg';
-      // this.sprite.src = 'assets/spaceShips_007.png';
-    });
   }
 }
 
@@ -66,7 +47,13 @@ export class Projectile extends AnimatedObject {
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
-    drawCircle(ctx, this.x, this.y, this.size, this.color);
+    ctx.drawImage(
+      Images.PROJECTILE,
+      this.x - this.size,
+      this.y - this.size,
+      2 * this.size,
+      2 * this.size,
+    );
   }
 
   update(dt: number): void {
