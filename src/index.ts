@@ -1,4 +1,4 @@
-import { Enemy, Player, Projectile } from './animatedObjects';
+import { Enemy, Player, Projectile, Smoke } from './animatedObjects';
 import { EnemySpawner } from './enemySpawner';
 import { arrayCrossProduct, drawRoundRect } from './util';
 import Images from './images';
@@ -16,14 +16,15 @@ class Game {
   private lastTimestamp: number = 0;
 
   public gameOver: boolean = false;
-  private score: number = 0;
+  public score: number = 0;
+  public player: Player
   public projectiles: Projectile[] = [];
-  private enemies: Enemy[] = [];
+  public enemies: Enemy[] = [];
+  public smokes: Smoke[] = [];
 
-  constructor(
-    public readonly player: Player,
-  ) {
-    this.enemySpawner = new EnemySpawner(canvas.width, canvas.height, player);
+  constructor() {
+    this.player = new Player(canvas.width / 2, canvas.height / 2);
+    this.enemySpawner = new EnemySpawner(canvas.width, canvas.height, this.player);
   }
 
   draw(): void {
@@ -35,6 +36,7 @@ class Game {
     this.player.draw(ctx);
     this.projectiles.forEach(projectile => projectile.draw(ctx));
     this.enemies.forEach(enemy => enemy.draw(ctx));
+    this.smokes.forEach(smoke => smoke.draw(ctx));
 
     // Draw score
     ctx.font = '24px Arial';
@@ -65,6 +67,9 @@ class Game {
       && projectile.y + projectile.size > 0
       && projectile.y - projectile.size < canvas.height,
     );
+
+    // Cleanup dead smokes
+    this.smokes = this.smokes.filter(smoke => !smoke.isDead());
   }
 
   spawn(): void {
@@ -99,6 +104,8 @@ class Game {
         if (enemy.shouldReduceSize()) {
           enemy.reduceSize();
         } else {
+          // Add smoke where the enemy was
+          this.smokes.push(new Smoke(enemy.x, enemy.y));
           this.enemies = this.enemies.filter(e => e !== enemy);
         }
 
@@ -150,19 +157,19 @@ class Game {
 async function main(): Promise<void> {
   await Images.initialize();
 
-  let game = new Game(new Player(canvas.width / 2, canvas.height / 2, 50, 0));
+  let game = new Game();
 
   // Spawn projectiles on mouse click
   canvas.addEventListener('mousedown', (event) => {
     if (game.gameOver) {
-      game = new Game(new Player(canvas.width / 2, canvas.height / 2, 50, 0));
+      game = new Game();
       game.run();
       return;
     }
 
     // New projectile at player position moving towards the mouse click
     const angle = Math.atan2(event.clientY - game.player.y, event.clientX - game.player.x);
-    const projectile = new Projectile(game.player.x, game.player.y, 10, 300, angle);
+    const projectile = new Projectile(game.player.x, game.player.y, 300, angle);
 
     game.projectiles.push(projectile);
   });
