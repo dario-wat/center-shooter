@@ -1,6 +1,6 @@
 import { drawCircle } from './util';
 
-// import ship from './assets/spaceShips_007.png';
+import ship from '../assets/spaceShips_007.png';
 
 export abstract class AnimatedObject {
 
