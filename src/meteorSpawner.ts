@@ -11,8 +11,6 @@ const SMALL_PROBABILITY = 0.5;
 const MEDIUM_PROBABILITY = 0.35;
 const LARGE_PROBABILITY = 0.15;
 
-const COLORS = ['red', 'blue', 'green', 'yellow'];
-
 export class MeteorSpawner {
 
   private lastSpawnTimestamp: number = 0;
@@ -30,7 +28,6 @@ export class MeteorSpawner {
   }
 
   spawn(): Meteor {
-    const color = COLORS[Math.floor(Math.random() * COLORS.length)];
     const velocity = Math.random() * (MAX_VELOCITY - MIN_VELOCITY) + MIN_VELOCITY;
     const size = getSize();
 

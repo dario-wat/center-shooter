@@ -144,15 +144,20 @@ export class Laser extends AnimatedObject {
     ctx.translate(this.player.x, this.player.y);
     ctx.rotate(this.player.angle - Math.PI / 2);
 
-    // Draw laser to the edge of the screen
-    const laserLength = 1000;
+    // Draw laser to the edge of the screen or to the hit point
+    const laserLength = this.hit ?
+      Math.sqrt(
+        Math.pow(this.hit.x - this.player.x, 2) +
+        Math.pow(this.hit.y - this.player.y, 2),
+      )
+      : 1000;
     const laserWidth = 10;
     ctx.drawImage(
       Images.LASER,
       -5,   // No clue why, but need this to center the laser
       this.player.size,
       laserWidth,
-      this.player.size + laserLength,
+      - this.player.size + laserLength,
     );
 
     ctx.rotate(-this.player.angle + Math.PI / 2);

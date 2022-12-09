@@ -119,6 +119,7 @@ class Game {
 
 
     // Collision between laser and meteors
+    // TODO closest one
     this.player.laser.hit = null;
     if (this.player.isLaserEquipped() && this.player.laser.isActive) {
       this.meteors.forEach(meteor => {
