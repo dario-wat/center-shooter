@@ -1,4 +1,4 @@
-import shipImage from '../assets/spaceShips_007.png';
+import shipImage from '../assets/playerShip2_red.png';
 import projectileImage from '../assets/spaceMissiles_012.png';
 import projectileTrailImage from '../assets/spaceEffects_002.png';
 import smoke1Image from '../assets/spaceEffects_013.png';
@@ -9,6 +9,7 @@ import meteor1Image from '../assets/spaceMeteors_001.png';
 import meteor2Image from '../assets/spaceMeteors_002.png';
 import meteor3Image from '../assets/spaceMeteors_003.png';
 import meteor4Image from '../assets/spaceMeteors_004.png';
+import laserImage from '../assets/laserRed16.png';
 
 async function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -32,6 +33,7 @@ export default class Images {
   public static METEOR_2: HTMLImageElement;
   public static METEOR_3: HTMLImageElement;
   public static METEOR_4: HTMLImageElement;
+  public static LASER: HTMLImageElement;
 
   public static async initialize(): Promise<void> {
     [
@@ -46,6 +48,7 @@ export default class Images {
       Images.METEOR_2,
       Images.METEOR_3,
       Images.METEOR_4,
+      Images.LASER,
     ] = await Promise.all([
       loadImage(shipImage),
       loadImage(projectileImage),
@@ -58,6 +61,7 @@ export default class Images {
       loadImage(meteor2Image),
       loadImage(meteor3Image),
       loadImage(meteor4Image),
+      loadImage(laserImage),
     ]);
   }
 }

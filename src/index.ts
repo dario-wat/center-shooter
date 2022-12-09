@@ -1,4 +1,4 @@
-import { Meteor, Player, Projectile, Smoke } from './animatedObjects';
+import { Laser, Meteor, Player, Projectile, Smoke } from './animatedObjects';
 import { MeteorSpawner } from './meteorSpawner';
 import { arrayCrossProduct, drawRoundRect } from './util';
 import Images from './images';
@@ -17,13 +17,15 @@ class Game {
 
   public gameOver: boolean = false;
   public score: number = 0;
-  public player: Player
+  public player: Player;
+  public laser: Laser;
   public projectiles: Projectile[] = [];
   public meteors: Meteor[] = [];
   public smokes: Smoke[] = [];
 
   constructor() {
     this.player = new Player(canvas.width / 2, canvas.height / 2);
+    this.laser = new Laser(this.player);
     this.meteorSpawner = new MeteorSpawner(canvas.width, canvas.height, this.player);
   }
 
@@ -37,6 +39,7 @@ class Game {
     this.projectiles.forEach(projectile => projectile.draw(ctx));
     this.meteors.forEach(meteor => meteor.draw(ctx));
     this.smokes.forEach(smoke => smoke.draw(ctx));
+    this.laser.draw(ctx);
 
     // Draw score
     ctx.font = '24px Arial';
@@ -49,6 +52,8 @@ class Game {
     this.player.update(dt);
     this.projectiles.forEach(projectile => projectile.update(dt));
     this.meteors.forEach(meteor => meteor.update(dt));
+    this.smokes.forEach(smoke => smoke.update(dt));
+    this.laser.update(dt);
   }
 
   cleanup(): void {
@@ -113,6 +118,9 @@ class Game {
         this.projectiles = this.projectiles.filter(p => p !== projectile);
       }
     });
+
+
+    // TODO collision with laser
   }
 
   run() {
@@ -159,6 +167,14 @@ async function main(): Promise<void> {
 
   let game = new Game();
 
+  // Activate laser while mouse is down
+  canvas.addEventListener('mousedown', (event) => {
+    // game.laser.isActive = true;
+  });
+  canvas.addEventListener('mouseup', (event) => {
+    game.laser.isActive = false;
+  });
+
   // Spawn projectiles on mouse click
   canvas.addEventListener('mousedown', (event) => {
     if (game.gameOver) {
@@ -170,7 +186,6 @@ async function main(): Promise<void> {
     // New projectile at player position moving towards the mouse click
     const angle = Math.atan2(event.clientY - game.player.y, event.clientX - game.player.x);
     const projectile = new Projectile(game.player.x, game.player.y, 300, angle);
-
     game.projectiles.push(projectile);
   });
 
