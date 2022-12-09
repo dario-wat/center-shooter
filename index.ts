@@ -2,6 +2,7 @@ import { Enemy, Player, Projectile } from './animatedObjects';
 import { EnemySpawner } from './enemySpawner';
 import { arrayCrossProduct, drawRoundRect } from './util';
 
+
 // Create canvas
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d');
@@ -14,7 +15,7 @@ class Game {
 
   private lastTimestamp: number = 0;
 
-  private playerAlive: boolean = true;
+  public gameOver: boolean = false;
   private score: number = 0;
   public projectiles: Projectile[] = [];
   private enemies: Enemy[] = [];
@@ -70,10 +71,44 @@ class Game {
     }
   }
 
+  collision(): void {
+    // Detect collision between player and enemies
+    const playerDead = this.enemies.some(enemy => {
+      const dx = this.player.x - enemy.x;
+      const dy = this.player.y - enemy.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      return distance < this.player.size + enemy.size;
+    });
+    this.gameOver = playerDead;
+
+    // Detect collision between enemies and projectiles
+    const enemiesAndProjectiles = arrayCrossProduct(this.enemies, this.projectiles);
+    enemiesAndProjectiles.forEach(([enemy, projectile]) => {
+      const dx = enemy.x - projectile.x;
+      const dy = enemy.y - projectile.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance < enemy.size + projectile.size) {
+        // If the projectile hits the enemy increase the score
+        this.score += 10;
+
+        // Remove or downsize the enemy
+        if (enemy.shouldReduceSize()) {
+          enemy.reduceSize();
+        } else {
+          this.enemies = this.enemies.filter(e => e !== enemy);
+        }
+
+        // Remove the projectile
+        this.projectiles = this.projectiles.filter(p => p !== projectile);
+      }
+    });
+  }
+
   run() {
     requestAnimationFrame(this.run.bind(this));
 
-    if (!this.playerAlive) {
+    if (this.gameOver) {
 
       drawRoundRect(ctx, canvas.width / 2 - 200, canvas.height / 2 - 100, 400, 200, 20);
 
@@ -87,38 +122,11 @@ class Game {
       return;
     }
 
-
-
     // Update objects
     this.update((Date.now() - this.lastTimestamp) / 1000);
+    this.lastTimestamp = Date.now();
 
-    // Detect collision between player and enemies
-    const playerDead = this.enemies.some(enemy => {
-      const dx = this.player.x - enemy.x;
-      const dy = this.player.y - enemy.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      return distance < this.player.size + enemy.size;
-    });
-    this.playerAlive = !playerDead;
-    console.log('Dead: ', playerDead ? 'Yes' : 'No');
-
-    // Remove enemies and projectiles that collide
-    const enemiesAndProjectiles = arrayCrossProduct(this.enemies, this.projectiles);
-    enemiesAndProjectiles.forEach(([enemy, projectile]) => {
-      const dx = enemy.x - projectile.x;
-      const dy = enemy.y - projectile.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance < enemy.size + projectile.size) {
-        this.score += 10;
-        // Remove enemy and projectile
-        if (enemy.shouldReduceSize()) {
-          enemy.reduceSize();
-        } else {
-          this.enemies = this.enemies.filter(e => e !== enemy);
-        }
-        this.projectiles = this.projectiles.filter(p => p !== projectile);
-      }
-    });
+    this.collision();
 
     // Cleanup off screen objects
     this.cleanup();
@@ -129,8 +137,6 @@ class Game {
     // before enemies enter the screen
     this.spawn();
 
-    this.lastTimestamp = Date.now();
-
     // Draw objects
     this.draw();
   }
@@ -140,11 +146,16 @@ let game = new Game(new Player(canvas.width / 2, canvas.height / 2, 50));
 
 // Spawn projectiles on mouse click
 canvas.addEventListener('mousedown', (event) => {
+  if (game.gameOver) {
+    game = new Game(new Player(canvas.width / 2, canvas.height / 2, 50));
+    game.run();
+    return;
+  }
+
   // New projectile at player position moving towards the mouse click
   const angle = Math.atan2(event.clientY - game.player.y, event.clientX - game.player.x);
   const projectile = new Projectile(game.player.x, game.player.y, 5, 300, angle);
 
-  // TODO needs to be cleaned up
   game.projectiles.push(projectile);
 });
 

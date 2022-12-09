@@ -11,7 +11,7 @@ module.exports = {
     extensions: ['.ts', '.tsx', '.js']
   },
   // devServer: {
-  //   contentBase: './dist'
+  //   contentBase: './dist',
   // },
   module: {
     rules: [
