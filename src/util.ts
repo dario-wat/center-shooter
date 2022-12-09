@@ -13,12 +13,21 @@ export function drawCircle(
   x: number,
   y: number,
   size: number,
-  color: string,
+  fillColor: string | null = null,
+  strokeCollor: string | null = null,
 ): void {
   ctx.beginPath();
   ctx.arc(x, y, size, 0, Math.PI * 2, false);
-  ctx.fillStyle = color;
-  ctx.fill();
+
+  if (fillColor !== null) {
+    ctx.fillStyle = fillColor;
+    ctx.fill();
+  }
+
+  if (strokeCollor !== null) {
+    ctx.strokeStyle = strokeCollor;
+    ctx.stroke();
+  }
 }
 
 export function drawRoundRect(

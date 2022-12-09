@@ -26,6 +26,9 @@ export class Player extends AnimatedObject {
       2 * this.size,
       2 * this.size,
     );
+
+    // Debug
+    drawCircle(ctx, this.x, this.y, this.size, null, 'blue');
   }
 
   update(_dt: number): void {
@@ -41,19 +44,25 @@ export class Projectile extends AnimatedObject {
     public size: number,
     private velocity: number,
     private angle: number,
-    private color: string = 'black',
   ) {
     super();
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.angle + Math.PI / 2);
     ctx.drawImage(
       Images.PROJECTILE,
-      this.x - this.size,
-      this.y - this.size,
-      2 * this.size,
-      2 * this.size,
+      -this.size * 0.8,
+      -this.size,
+      this.size * 1.6,
+      this.size * 2.0,
     );
+    ctx.rotate(-this.angle - Math.PI / 2);
+    ctx.translate(-this.x, -this.y);
+
+    // Debug  
+    drawCircle(ctx, this.x, this.y, this.size, null, 'red');
   }
 
   update(dt: number): void {
