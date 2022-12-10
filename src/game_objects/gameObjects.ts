@@ -3,17 +3,7 @@ import { AnimatedObject } from './animatedObject';
 
 export class Meteor extends AnimatedObject {
 
-  public static readonly SMALL_SIZE = 20;
-  public static readonly MEDIUM_SIZE = 35;
-  public static readonly LARGE_SIZE = 50;
-
-  public static readonly SMALL_HP_LIMIT = 0;
-  public static readonly MEDIUM_HP_LIMIT = 40;
-  public static readonly LARGE_HP_LIMIT = 70;
-
-  public static readonly SMALL_HP = 30;
-  public static readonly MEDIUM_HP = 65;
-  public static readonly LARGE_HP = 100;
+  private static readonly MIN_SIZE = 20;
 
   private readonly meteorType: number;  // 0, 1, 2, 3
 
@@ -68,7 +58,7 @@ export class Meteor extends AnimatedObject {
   }
 
   size(): number {
-    return this.hp / 2 + Meteor.SMALL_SIZE;
+    return this.hp / 2 + Meteor.MIN_SIZE;
   }
 
   isDead(): boolean {

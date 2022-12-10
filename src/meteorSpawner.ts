@@ -7,9 +7,8 @@ const MAX_INTERVAL = 2000;
 const MIN_VELOCITY = 50;
 const MAX_VELOCITY = 200;
 
-const SMALL_PROBABILITY = 0.5;
-const MEDIUM_PROBABILITY = 0.35;
-const LARGE_PROBABILITY = 0.15;
+const MIN_HP = 20;
+const MAX_HP = 100;
 
 export class MeteorSpawner {
 
@@ -29,30 +28,28 @@ export class MeteorSpawner {
 
   spawn(): Meteor {
     const velocity = Math.random() * (MAX_VELOCITY - MIN_VELOCITY) + MIN_VELOCITY;
-    const size = getRandomSize();
-    const hp = size === Meteor.SMALL_SIZE
-      ? Meteor.SMALL_HP
-      : size === Meteor.MEDIUM_SIZE ? Meteor.MEDIUM_HP : Meteor.LARGE_HP;
+    const hp = Math.random() * (MAX_HP - MIN_HP) + MIN_HP;
 
     // Spawn at random point off screen
     const side = Math.floor(Math.random() * 4);
+    const offset = 100; // Spawn off screen by 100px
     let x = 0;
     let y = 0;
     switch (side) {
       case 0: // Top
         x = Math.random() * this.canvasWidth;
-        y = -size;
+        y = -offset;
         break;
       case 1: // Right
-        x = this.canvasWidth + size;
+        x = this.canvasWidth + offset;
         y = Math.random() * this.canvasHeight;
         break;
       case 2: // Bottom
         x = Math.random() * this.canvasWidth;
-        y = this.canvasHeight + size;
+        y = this.canvasHeight + offset;
         break;
       case 3: // Left
-        x = -size;
+        x = -offset;
         y = Math.random() * this.canvasHeight;
         break;
     }
@@ -65,14 +62,3 @@ export class MeteorSpawner {
     return new Meteor(x, y, hp, velocity, angle);
   }
 }
-
-function getRandomSize(): number {
-  const probability = Math.random();
-  if (probability < SMALL_PROBABILITY) {
-    return Meteor.SMALL_SIZE;
-  }
-  if (probability < SMALL_PROBABILITY + MEDIUM_PROBABILITY) {
-    return Meteor.MEDIUM_SIZE;
-  }
-  return Meteor.LARGE_SIZE;
-};

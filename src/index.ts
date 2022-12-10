@@ -11,7 +11,8 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 function isOffScreen(x: number, y: number, size: number): boolean {
-  return x + size < 0 || x - size > canvas.width || y + size < 0 || y - size > canvas.height;
+  const margin = 200;   // Biggest meteor is around 100px
+  return x < -margin || x > canvas.width + margin || y < -margin || y > canvas.height + margin;
 }
 
 class Game {
