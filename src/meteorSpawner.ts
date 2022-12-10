@@ -29,7 +29,10 @@ export class MeteorSpawner {
 
   spawn(): Meteor {
     const velocity = Math.random() * (MAX_VELOCITY - MIN_VELOCITY) + MIN_VELOCITY;
-    const size = getSize();
+    const size = getRandomSize();
+    const hp = size === Meteor.SMALL_SIZE
+      ? Meteor.SMALL_HP
+      : size === Meteor.MEDIUM_SIZE ? Meteor.MEDIUM_HP : Meteor.LARGE_HP;
 
     // Spawn at random point off screen
     const side = Math.floor(Math.random() * 4);
@@ -59,11 +62,11 @@ export class MeteorSpawner {
     this.lastSpawnTimestamp = Date.now();
     this.nextSpawnInterval = Math.random() * (MAX_INTERVAL - MIN_INTERVAL) + MIN_INTERVAL;
 
-    return new Meteor(x, y, size, velocity, angle);
+    return new Meteor(x, y, hp, velocity, angle);
   }
 }
 
-function getSize(): number {
+function getRandomSize(): number {
   const probability = Math.random();
   if (probability < SMALL_PROBABILITY) {
     return Meteor.SMALL_SIZE;

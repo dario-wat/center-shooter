@@ -7,12 +7,20 @@ export class Meteor extends AnimatedObject {
   public static readonly MEDIUM_SIZE = 35;
   public static readonly LARGE_SIZE = 50;
 
+  public static readonly SMALL_HP_LIMIT = 0;
+  public static readonly MEDIUM_HP_LIMIT = 40;
+  public static readonly LARGE_HP_LIMIT = 70;
+
+  public static readonly SMALL_HP = 30;
+  public static readonly MEDIUM_HP = 65;
+  public static readonly LARGE_HP = 100;
+
   private meteorType: number;  // 0, 1, 2, 3
 
   constructor(
     public x: number,
     public y: number,
-    public size: number,
+    public hp: number,
     private velocity: number,
     private angle: number,
   ) {
@@ -40,12 +48,13 @@ export class Meteor extends AnimatedObject {
         break;
     }
 
+    const size = this.size();
     ctx.drawImage(
       meteorImage,
-      this.x - this.size,
-      this.y - this.size,
-      this.size * 2,
-      this.size * 2,
+      this.x - size,
+      this.y - size,
+      size * 2,
+      size * 2,
     );
   }
 
@@ -54,19 +63,16 @@ export class Meteor extends AnimatedObject {
     this.y += this.velocity * Math.sin(this.angle) * dt;
   }
 
-  shouldReduceSize(): boolean {
-    // Otherwise it should die
-    return this.size > Meteor.SMALL_SIZE;
+  size(): number {
+    return this.hp >= Meteor.LARGE_HP_LIMIT
+      ? Meteor.LARGE_SIZE
+      : this.hp >= Meteor.MEDIUM_HP_LIMIT
+        ? Meteor.MEDIUM_SIZE
+        : Meteor.SMALL_SIZE;
   }
 
-  reduceSize(): void {
-    if (this.size === Meteor.LARGE_SIZE) {
-      this.size = Meteor.MEDIUM_SIZE;
-    } else if (this.size === Meteor.MEDIUM_SIZE) {
-      this.size = Meteor.SMALL_SIZE;
-    } else {
-      // Enemy is already small, so remove it
-    }
+  isDead(): boolean {
+    return this.hp <= 0;
   }
 }
 

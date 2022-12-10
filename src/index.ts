@@ -57,10 +57,10 @@ class Game {
   cleanup(): void {
     // Cleanup meteors that are off screen
     this.meteors = this.meteors.filter(meteor =>
-      meteor.x + meteor.size > 0
-      && meteor.x - meteor.size < canvas.width
-      && meteor.y + meteor.size > 0
-      && meteor.y - meteor.size < canvas.height,
+      meteor.x + meteor.size() > 0
+      && meteor.x - meteor.size() < canvas.width
+      && meteor.y + meteor.size() > 0
+      && meteor.y - meteor.size() < canvas.height,
     );
 
     // Clenaup projectiles that are off screen
@@ -88,7 +88,7 @@ class Game {
       const dx = this.player.x - meteor.x;
       const dy = this.player.y - meteor.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
-      return distance < this.player.size + meteor.size;
+      return distance < this.player.size + meteor.size();
     });
     this.gameOver = playerDead;
 
@@ -99,14 +99,13 @@ class Game {
       const dy = meteor.y - projectile.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      if (distance < meteor.size + projectile.size) {
+      if (distance < meteor.size() + projectile.size) {
         // If the projectile hits the meteor increase the score
         this.score += 10;
 
+        meteor.hp -= Projectile.DAMAGE;
         // Remove or downsize the meteor
-        if (meteor.shouldReduceSize()) {
-          meteor.reduceSize();
-        } else {
+        if (meteor.isDead()) {
           // Add smoke where the meteor was
           this.smokes.push(new Smoke(meteor.x, meteor.y));
           this.meteors = this.meteors.filter(m => m !== meteor);
@@ -126,7 +125,7 @@ class Game {
         // Circle and line intersection
         const intersection = intersectRayAndCircle(
           this.player.x, this.player.y, this.player.angle,
-          meteor.x, meteor.y, meteor.size,
+          meteor.x, meteor.y, meteor.size(),
         );
         if (intersection !== null) {
           const distance = euclDistance(this.player.x, this.player.y, intersection.x, intersection.y);

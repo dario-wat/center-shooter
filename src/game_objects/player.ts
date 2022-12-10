@@ -79,6 +79,8 @@ export class Player extends AnimatedObject {
 
 export class Projectile extends AnimatedObject {
 
+  public static readonly DAMAGE = 35;
+
   constructor(
     public x: number,
     public y: number,
