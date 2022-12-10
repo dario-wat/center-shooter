@@ -10,6 +10,10 @@ const ctx = canvas.getContext('2d')!;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+function isOffScreen(x: number, y: number, size: number): boolean {
+  return x + size < 0 || x - size > canvas.width || y + size < 0 || y - size > canvas.height;
+}
+
 class Game {
 
   private readonly meteorSpawner: MeteorSpawner;
@@ -33,7 +37,9 @@ class Game {
   draw(): void {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = '#202020';
+    // Tile background
+    const pattern = ctx.createPattern(Images.BLACK_BACKGROUND, 'repeat')!;
+    ctx.fillStyle = pattern;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     this.projectiles.forEach(projectile => projectile.draw(ctx));
@@ -57,18 +63,12 @@ class Game {
   cleanup(): void {
     // Cleanup meteors that are off screen
     this.meteors = this.meteors.filter(meteor =>
-      meteor.x + meteor.size() > 0
-      && meteor.x - meteor.size() < canvas.width
-      && meteor.y + meteor.size() > 0
-      && meteor.y - meteor.size() < canvas.height,
+      !isOffScreen(meteor.x, meteor.y, meteor.size())
     );
 
     // Clenaup projectiles that are off screen
     this.projectiles = this.projectiles.filter(projectile =>
-      projectile.x + projectile.size > 0
-      && projectile.x - projectile.size < canvas.width
-      && projectile.y + projectile.size > 0
-      && projectile.y - projectile.size < canvas.height,
+      !isOffScreen(projectile.x, projectile.y, projectile.size)
     );
 
     // Cleanup dead smokes
@@ -84,12 +84,18 @@ class Game {
 
   collision(): void {
     // Detect collision between player and meteors
-    const playerHit = this.meteors.some(meteor => {
+    const meteorPlayerHits = this.meteors.filter(meteor => {
       const distance = euclDistance(this.player.x, this.player.y, meteor.x, meteor.y);
       return distance < this.player.size + meteor.size();
     });
-    if (playerHit) {
-      this.player.removeLife();
+    if (meteorPlayerHits.length > 0) {
+      // Remove meteors that hit the player
+      this.meteors = this.meteors.filter(meteor => !meteorPlayerHits.includes(meteor));
+      meteorPlayerHits.forEach(meteor => {
+        this.smokes.push(new Smoke(meteor.x, meteor.y));
+      });
+      this.score += meteorPlayerHits.length * 10;
+      this.player.hit();
     }
     this.gameOver = this.player.isDead();
 

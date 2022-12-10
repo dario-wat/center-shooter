@@ -12,6 +12,7 @@ import meteor4Image from '../assets/spaceMeteors_004.png';
 import laserImage from '../assets/laserRed16.png';
 import laserHitImage from '../assets/laserRed08.png';
 import playerLifeImage from '../assets/playerLife2_red.png';
+import blackBackgroundImage from '../assets/black.png';
 
 async function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -38,6 +39,7 @@ export default class Images {
   public static LASER: HTMLImageElement;
   public static LASER_HIT: HTMLImageElement;
   public static PLAYER_LIFE: HTMLImageElement;
+  public static BLACK_BACKGROUND: HTMLImageElement;
 
   public static async initialize(): Promise<void> {
     [
@@ -55,6 +57,7 @@ export default class Images {
       Images.LASER,
       Images.LASER_HIT,
       Images.PLAYER_LIFE,
+      Images.BLACK_BACKGROUND,
     ] = await Promise.all([
       loadImage(shipImage),
       loadImage(projectileImage),
@@ -70,6 +73,7 @@ export default class Images {
       loadImage(laserImage),
       loadImage(laserHitImage),
       loadImage(playerLifeImage),
+      loadImage(blackBackgroundImage),
     ]);
   }
 }

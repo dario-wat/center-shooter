@@ -1,10 +1,10 @@
 [] Multiple weapon types
-[] Laser collisions and damage
+[x] Laser collisions and damage
 [] Weapon upgrades
 [] Game becomes more difficult over time
 [] Special upgrades (one time use)
-[] Background space
+[x] Background space
 [] More intelligent enemies
 [] Spawn meteors based on HP
-[] Player invulnerable for a second after being hit
-[] Meteor destroyed after it hits the player
+[x] Player invulnerable for a second after being hit
+[x] Meteor destroyed after it hits the player

@@ -10,8 +10,11 @@ enum WeaponType {
 
 export class Player extends AnimatedObject {
 
+  private static readonly INVINCIBILITY_DURATION = 2000;
+
   private activeWeapon: WeaponType = WeaponType.PROJECTILE;
   private lives: number = 3;
+  private lastHitTimestamp: number = 0;
 
   public laser: Laser;
 
@@ -28,6 +31,9 @@ export class Player extends AnimatedObject {
   draw(ctx: CanvasRenderingContext2D): void {
     ctx.translate(this.x, this.y);
     ctx.rotate(this.angle + Math.PI / 2);
+    if (this.isInvinicible()) {
+      ctx.globalAlpha = 0.4;
+    }
 
     ctx.drawImage(
       Images.SHIP,
@@ -37,6 +43,7 @@ export class Player extends AnimatedObject {
       2 * this.size,
     );
 
+    ctx.globalAlpha = 1;
     ctx.rotate(-this.angle - Math.PI / 2);
     ctx.translate(-this.x, -this.y);
 
@@ -60,7 +67,6 @@ export class Player extends AnimatedObject {
         lifeSize,
       );
     }
-
   }
 
   update(dt: number): void {
@@ -84,8 +90,17 @@ export class Player extends AnimatedObject {
     return this.lives <= 0;
   }
 
-  removeLife(): void {
+  isInvinicible(): boolean {
+    return Date.now() - this.lastHitTimestamp < Player.INVINCIBILITY_DURATION;
+  }
+
+  // Run this when player gets hit
+  hit(): void {
+    if (this.isInvinicible()) {
+      return;
+    }
     this.lives--;
+    this.lastHitTimestamp = Date.now();
   }
 
   // Spawns new projectile in the direction where the player is facing
