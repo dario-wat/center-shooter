@@ -20,9 +20,7 @@ export class ProjectileBurstPower {
     ) {
       this.remainingShots--;
       this.lastShotTimestamp = Date.now();
-
-      // TODO
-      // this.player.fireProjectileBurst();
+      this.player.fireProjectileBurst();
     }
   }
 

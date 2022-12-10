@@ -2,6 +2,7 @@ import { drawCircle, euclDistance } from '../util';
 import Images from '../images';
 import { DEBUG_COLLISIONS } from '../config';
 import { AnimatedObject } from './animatedObject';
+import { Game } from '../gameState';
 
 enum WeaponType {
   LASER,
@@ -19,6 +20,7 @@ export class Player extends AnimatedObject {
   public laser: Laser;
 
   constructor(
+    private game: Game,
     public x: number,
     public y: number,
     public size: number = 50,
@@ -93,7 +95,7 @@ export class Player extends AnimatedObject {
     return new Projectile(this.x, this.y, this.angle);
   }
 
-  fireProjectileBurst(): Projectile[] {
+  fireProjectileBurst(): void {
     const numProjectiles = 40;
     const angleOffset = 2 * Math.PI / numProjectiles;
     const projectiles: Projectile[] = [];
@@ -101,7 +103,7 @@ export class Player extends AnimatedObject {
       const angle = this.angle + (i - numProjectiles / 2) * angleOffset;
       projectiles.push(new Projectile(this.x, this.y, angle));
     }
-    return projectiles;
+    this.game.projectiles.push(...projectiles);
   }
 
   changeWeapon(): void {

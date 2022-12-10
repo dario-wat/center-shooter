@@ -7,9 +7,11 @@ import { ProjectileBurstPower } from './projectileBurstPower';
 
 export class Game {
 
+  private static game: Game;
+
   private readonly meteorSpawner: MeteorSpawner;
 
-  private canvas: HTMLCanvasElement;
+  public canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
 
   private lastTimestamp: number = 0;
@@ -26,14 +28,25 @@ export class Game {
   public meteors: Meteor[] = [];
   public smokes: Smoke[] = [];
 
-  constructor(canvas: HTMLCanvasElement) {
-    this.canvas = canvas;
-    this.ctx = canvas.getContext('2d')!;
-    this.player = new Player(canvas.width / 2, canvas.height / 2);
-    this.meteorSpawner = new MeteorSpawner(canvas.width, canvas.height, this.player);
+  private constructor() {
+    // Create canvas
+    this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+    this.ctx = this.canvas.getContext('2d')!;
+
+    this.player = new Player(this, this.canvas.width / 2, this.canvas.height / 2);
+    this.meteorSpawner = new MeteorSpawner(this.canvas.width, this.canvas.height, this.player);
 
     // TODO start with projectile burst power
     this.projectileBurstPower = new ProjectileBurstPower(this.player);
+  }
+
+  public static get(): Game {
+    if (!Game.game) {
+      Game.game = new Game();
+    }
+    return Game.game;
   }
 
   draw(): void {

@@ -6,18 +6,14 @@ import Images from './images';
 import { ProjectileBurstPower } from './projectileBurstPower';
 import { Game } from './gameState';
 
-// Create canvas
-const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
 
 async function main(): Promise<void> {
   await Images.initialize();
 
-  let game = new Game(canvas);
+  let game = Game.get();
 
   // Activate laser while mouse is down
-  canvas.addEventListener('mousedown', (event) => {
+  game.canvas.addEventListener('mousedown', (event) => {
     if (event.button === 2) {
       return;
     }
@@ -25,12 +21,12 @@ async function main(): Promise<void> {
       game.player.laser.isActive = true;
     }
   });
-  canvas.addEventListener('mouseup', (event) => {
+  game.canvas.addEventListener('mouseup', (event) => {
     game.player.laser.isActive = false;
   });
 
   // Spawn projectiles on mouse click
-  canvas.addEventListener('mousedown', (event) => {
+  game.canvas.addEventListener('mousedown', (event) => {
     // Ignore right click
     if (event.button === 2) {
       return;
@@ -49,13 +45,14 @@ async function main(): Promise<void> {
   });
 
   // Player faces the mouse position
-  canvas.addEventListener('mousemove', (event) => {
+  game.canvas.addEventListener('mousemove', (event) => {
     game.player.angle = Math.atan2(event.clientY - game.player.y, event.clientX - game.player.x);
   });
 
   // Change weapon on right click
-  canvas.addEventListener('contextmenu', (event) => {
+  game.canvas.addEventListener('contextmenu', (event) => {
     event.preventDefault();
+    // TODO
     // game.player.changeWeapon();
     game.projectileBurstPower.activate();
   });
