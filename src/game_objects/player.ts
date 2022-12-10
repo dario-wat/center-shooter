@@ -130,6 +130,8 @@ export class Projectile extends AnimatedObject {
 
 export class Laser extends AnimatedObject {
 
+  public static readonly DPS = 120;
+
   public isActive: boolean = false;
   public hit: LaserHit | null = null;
 

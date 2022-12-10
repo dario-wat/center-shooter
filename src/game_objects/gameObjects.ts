@@ -20,7 +20,7 @@ export class Meteor extends AnimatedObject {
   constructor(
     public x: number,
     public y: number,
-    public hp: number,
+    private hp: number,
     private velocity: number,
     private angle: number,
   ) {
@@ -61,6 +61,10 @@ export class Meteor extends AnimatedObject {
   update(dt: number): void {
     this.x += this.velocity * Math.cos(this.angle) * dt;
     this.y += this.velocity * Math.sin(this.angle) * dt;
+  }
+
+  takeDamage(damage: number): void {
+    this.hp -= damage;
   }
 
   size(): number {

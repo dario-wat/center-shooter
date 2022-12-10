@@ -103,7 +103,7 @@ class Game {
         // If the projectile hits the meteor increase the score
         this.score += 10;
 
-        meteor.hp -= Projectile.DAMAGE;
+        meteor.takeDamage(Projectile.DAMAGE);
         // Remove or downsize the meteor
         if (meteor.isDead()) {
           // Add smoke where the meteor was
@@ -120,6 +120,7 @@ class Game {
     // Collision between laser and meteors
     this.player.laser.hit = null;
     let distanceToMeteor = Infinity;
+    let meteorToHit: Meteor | null = null;
     if (this.player.isLaserFiring()) {
       this.meteors.forEach(meteor => {
         // Circle and line intersection
@@ -132,9 +133,16 @@ class Game {
           if (distance < distanceToMeteor) {
             this.player.laser.hit = new LaserHit(intersection.x, intersection.y);
             distanceToMeteor = distance;
+            meteorToHit = meteor;
           }
         }
       });
+    }
+
+    meteorToHit?.takeDamage(Laser.DPS / 60);
+    if (meteorToHit?.isDead()) {
+      this.meteors = this.meteors.filter(m => m !== meteorToHit);
+      this.smokes.push(new Smoke(meteorToHit.x, meteorToHit.y));
     }
   }
 
