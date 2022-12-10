@@ -17,6 +17,7 @@ export class Player extends AnimatedObject {
   public lives: number = 3;
   private lastHitTimestamp: number = 0;
 
+  // Game objects
   public laser: Laser;
 
   constructor(

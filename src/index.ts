@@ -12,15 +12,6 @@ async function main(): Promise<void> {
 
   let game = Game.get();
 
-  // Activate laser while mouse is down
-  game.canvas.addEventListener('mousedown', (event) => {
-    if (event.button === 2) {
-      return;
-    }
-    if (game.player.isLaserEquipped()) {
-      game.player.laser.isActive = true;
-    }
-  });
   game.canvas.addEventListener('mouseup', (event) => {
     game.player.laser.isActive = false;
   });
@@ -37,9 +28,21 @@ async function main(): Promise<void> {
     //   return;
     // }
 
-    // New projectile at player position moving towards the mouse click
-    if (game.player.isProjectileEquipped()) {
+    if (
+      game.projectileBurstPowerup
+      && euclDistance(
+        game.projectileBurstPowerup.x,
+        game.projectileBurstPowerup.y,
+        event.clientX,
+        event.clientY
+      ) < game.projectileBurstPowerup.size
+    ) {
+      game.projectileBurstPowerup = null;
+      game.projectileBurstPower = new ProjectileBurstPower(game.player);
+    } else if (game.player.isProjectileEquipped()) {
       game.player.fireProjectile();
+    } else if (game.player.isLaserEquipped()) {
+      game.player.laser.isActive = true;
     }
   });
 

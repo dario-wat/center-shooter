@@ -53,7 +53,6 @@ export class ProjectileBurstPowerupSpawner {
       if (euclDistance(x, y, this.player.x, this.player.y) > this.player.size * 2) {
         break;
       }
-
     }
 
     Game.get().projectileBurstPowerup = new ProjectileBurstPowerup(x, y);

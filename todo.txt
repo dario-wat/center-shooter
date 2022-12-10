@@ -1,8 +1,9 @@
-[] Multiple weapon types
+[x] Multiple weapon types
 [x] Laser collisions and damage
 [] Weapon upgrades
 [] Game becomes more difficult over time
-[] Special upgrades (one time use)
+[x] Special attack rockets
+[] Another special attack
 [x] Background space
 [] More intelligent enemies
 [x] Spawn meteors based on HP
