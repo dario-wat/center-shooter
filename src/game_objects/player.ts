@@ -13,7 +13,7 @@ export class Player extends AnimatedObject {
   private static readonly INVINCIBILITY_DURATION = 2000;
 
   private activeWeapon: WeaponType = WeaponType.PROJECTILE;
-  private lives: number = 3;
+  public lives: number = 3;
   private lastHitTimestamp: number = 0;
 
   public laser: Laser;
@@ -31,7 +31,7 @@ export class Player extends AnimatedObject {
   draw(ctx: CanvasRenderingContext2D): void {
     ctx.translate(this.x, this.y);
     ctx.rotate(this.angle + Math.PI / 2);
-    if (this.isInvinicible()) {
+    if (this.isInvincible()) {
       ctx.globalAlpha = 0.4;
     }
 
@@ -52,21 +52,6 @@ export class Player extends AnimatedObject {
     }
 
     this.laser.draw(ctx);
-
-    // Draw lives
-    const lifeSize = 24;
-    const lifePadding = 10;
-    const lifeX = 20;
-    const lifeY = 60;
-    for (let i = 0; i < this.lives; i++) {
-      ctx.drawImage(
-        Images.SHIP,
-        lifeX + i * (lifeSize + lifePadding),
-        lifeY,
-        lifeSize,
-        lifeSize,
-      );
-    }
   }
 
   update(dt: number): void {
@@ -90,13 +75,13 @@ export class Player extends AnimatedObject {
     return this.lives <= 0;
   }
 
-  isInvinicible(): boolean {
+  isInvincible(): boolean {
     return Date.now() - this.lastHitTimestamp < Player.INVINCIBILITY_DURATION;
   }
 
   // Run this when player gets hit
   hit(): void {
-    if (this.isInvinicible()) {
+    if (this.isInvincible()) {
       return;
     }
     this.lives--;
@@ -106,6 +91,17 @@ export class Player extends AnimatedObject {
   // Spawns new projectile in the direction where the player is facing
   fireProjectile(): Projectile {
     return new Projectile(this.x, this.y, this.angle);
+  }
+
+  fireProjectileBurst(): Projectile[] {
+    const numProjectiles = 40;
+    const angleOffset = 2 * Math.PI / numProjectiles;
+    const projectiles: Projectile[] = [];
+    for (let i = 0; i < numProjectiles; i++) {
+      const angle = this.angle + (i - numProjectiles / 2) * angleOffset;
+      projectiles.push(new Projectile(this.x, this.y, angle));
+    }
+    return projectiles;
   }
 
   changeWeapon(): void {

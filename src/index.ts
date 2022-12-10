@@ -3,6 +3,7 @@ import { Laser, LaserHit, Player, Projectile } from './game_objects/player';
 import { MeteorSpawner } from './meteorSpawner';
 import { arrayCrossProduct, drawRoundRect, euclDistance, intersectRayAndCircle } from './util';
 import Images from './images';
+import { ProjectileBurstPower } from './projectileBurstPower';
 
 // Create canvas
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -24,6 +25,9 @@ class Game {
   public gameOver: boolean = false;
   public score: number = 0;
 
+  // Powers
+  public projectileBurstPower: ProjectileBurstPower | null = null;
+
   // Game objects in the scene
   public player: Player;
   public projectiles: Projectile[] = [];
@@ -33,6 +37,9 @@ class Game {
   constructor() {
     this.player = new Player(canvas.width / 2, canvas.height / 2);
     this.meteorSpawner = new MeteorSpawner(canvas.width, canvas.height, this.player);
+
+    // TODO start with projectile burst power
+    this.projectileBurstPower = new ProjectileBurstPower(this.player);
   }
 
   draw(): void {
@@ -48,10 +55,43 @@ class Game {
     this.smokes.forEach(smoke => smoke.draw(ctx));
     this.player.draw(ctx);
 
+    const uiXOffset = 20;
+
     // Draw score
+    const scoreY = 40;
     ctx.font = '24px Arial';
     ctx.fillStyle = 'white';
-    ctx.fillText(`Score: ${this.score}`, 20, 40);
+    ctx.fillText(`Score: ${this.score}`, uiXOffset, scoreY);
+
+    // Draw lives
+    const lifeSize = 24;
+    const lifePadding = 10;
+    const lifeY = 60;
+    for (let i = 0; i < this.player.lives; i++) {
+      ctx.drawImage(
+        Images.SHIP,
+        uiXOffset + i * (lifeSize + lifePadding),
+        lifeY,
+        lifeSize,
+        lifeSize,
+      );
+    }
+
+    // Draw projectile burst power
+    if (
+      this.projectileBurstPower !== null
+      && !this.projectileBurstPower.isActive
+    ) {
+      const powerY = 105;
+      const powerSize = 24;
+      ctx.drawImage(
+        Images.POWERUP_RED_STAR,
+        uiXOffset,
+        powerY,
+        powerSize,
+        powerSize,
+      );
+    }
   }
 
   update(dt: number): void {
@@ -74,6 +114,11 @@ class Game {
 
     // Cleanup dead smokes
     this.smokes = this.smokes.filter(smoke => !smoke.isDead());
+
+    // Cleanup projectile burst
+    if (this.projectileBurstPower?.isDead()) {
+      this.projectileBurstPower = null;
+    }
   }
 
   spawn(): void {
@@ -81,6 +126,8 @@ class Game {
     if (this.meteorSpawner.shouldSpawn()) {
       this.meteors.push(this.meteorSpawner.spawn());
     }
+
+    this.projectileBurstPower?.use();
   }
 
   collision(): void {
@@ -225,8 +272,8 @@ async function main(): Promise<void> {
 
     // New projectile at player position moving towards the mouse click
     if (game.player.isProjectileEquipped()) {
-      const projectile = game.player.fireProjectile();
-      game.projectiles.push(projectile);
+      const projectile = game.player.fireProjectileBurst();
+      game.projectiles = game.projectiles.concat(projectile);
     }
   });
 
@@ -238,7 +285,8 @@ async function main(): Promise<void> {
   // Change weapon on right click
   canvas.addEventListener('contextmenu', (event) => {
     event.preventDefault();
-    game.player.changeWeapon();
+    // game.player.changeWeapon();
+    game.projectileBurstPower.activate();
   });
 
   game.run();

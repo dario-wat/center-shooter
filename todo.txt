@@ -8,3 +8,5 @@
 [x] Spawn meteors based on HP
 [x] Player invulnerable for a second after being hit
 [x] Meteor destroyed after it hits the player
+[] Fix scoring
+[] Spawn powerups
