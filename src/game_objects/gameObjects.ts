@@ -1,4 +1,6 @@
+import { DEBUG_COLLISIONS, DEBUG_HP } from '../config';
 import Images from '../images';
+import { drawCircle } from '../util';
 import { AnimatedObject } from './animatedObject';
 
 export class Meteor extends AnimatedObject {
@@ -46,6 +48,15 @@ export class Meteor extends AnimatedObject {
       size * 2,
       size * 2,
     );
+
+    if (DEBUG_COLLISIONS) {
+      drawCircle(ctx, this.x, this.y, this.size(), null, 'blue');
+    }
+    if (DEBUG_HP) {
+      ctx.fillStyle = 'red';
+      ctx.font = '18px Arial';
+      ctx.fillText(this.hp.toFixed(0).toString(), this.x - 10, this.y);
+    }
   }
 
   update(dt: number): void {

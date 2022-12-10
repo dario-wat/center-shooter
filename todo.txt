@@ -5,6 +5,6 @@
 [] Special upgrades (one time use)
 [x] Background space
 [] More intelligent enemies
-[] Spawn meteors based on HP
+[x] Spawn meteors based on HP
 [x] Player invulnerable for a second after being hit
 [x] Meteor destroyed after it hits the player
