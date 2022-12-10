@@ -11,6 +11,7 @@ enum WeaponType {
 export class Player extends AnimatedObject {
 
   private activeWeapon: WeaponType = WeaponType.PROJECTILE;
+  private lives: number = 3;
 
   public laser: Laser;
 
@@ -44,19 +45,27 @@ export class Player extends AnimatedObject {
     }
 
     this.laser.draw(ctx);
+
+    // Draw lives
+    const lifeSize = 24;
+    const lifePadding = 10;
+    const lifeX = 20;
+    const lifeY = 60;
+    for (let i = 0; i < this.lives; i++) {
+      ctx.drawImage(
+        Images.SHIP,
+        lifeX + i * (lifeSize + lifePadding),
+        lifeY,
+        lifeSize,
+        lifeSize,
+      );
+    }
+
   }
 
   update(dt: number): void {
     // Player has no updates so only update the laser
     this.laser.update(dt);
-  }
-
-  changeWeapon(): void {
-    if (this.activeWeapon === WeaponType.PROJECTILE) {
-      this.activeWeapon = WeaponType.LASER;
-    } else {
-      this.activeWeapon = WeaponType.PROJECTILE;
-    }
   }
 
   isLaserEquipped(): boolean {
@@ -71,9 +80,25 @@ export class Player extends AnimatedObject {
     return this.isLaserEquipped() && this.laser.isActive;
   }
 
+  isDead(): boolean {
+    return this.lives <= 0;
+  }
+
+  removeLife(): void {
+    this.lives--;
+  }
+
   // Spawns new projectile in the direction where the player is facing
   fireProjectile(): Projectile {
     return new Projectile(this.x, this.y, this.angle);
+  }
+
+  changeWeapon(): void {
+    if (this.activeWeapon === WeaponType.PROJECTILE) {
+      this.activeWeapon = WeaponType.LASER;
+    } else {
+      this.activeWeapon = WeaponType.PROJECTILE;
+    }
   }
 }
 

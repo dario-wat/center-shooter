@@ -15,7 +15,7 @@ export class Meteor extends AnimatedObject {
   public static readonly MEDIUM_HP = 65;
   public static readonly LARGE_HP = 100;
 
-  private meteorType: number;  // 0, 1, 2, 3
+  private readonly meteorType: number;  // 0, 1, 2, 3
 
   constructor(
     public x: number,
@@ -68,11 +68,7 @@ export class Meteor extends AnimatedObject {
   }
 
   size(): number {
-    return this.hp >= Meteor.LARGE_HP_LIMIT
-      ? Meteor.LARGE_SIZE
-      : this.hp >= Meteor.MEDIUM_HP_LIMIT
-        ? Meteor.MEDIUM_SIZE
-        : Meteor.SMALL_SIZE;
+    return this.hp / 2 + Meteor.SMALL_SIZE;
   }
 
   isDead(): boolean {

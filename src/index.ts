@@ -84,13 +84,14 @@ class Game {
 
   collision(): void {
     // Detect collision between player and meteors
-    const playerDead = this.meteors.some(meteor => {
-      const dx = this.player.x - meteor.x;
-      const dy = this.player.y - meteor.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+    const playerHit = this.meteors.some(meteor => {
+      const distance = euclDistance(this.player.x, this.player.y, meteor.x, meteor.y);
       return distance < this.player.size + meteor.size();
     });
-    this.gameOver = playerDead;
+    if (playerHit) {
+      this.player.removeLife();
+    }
+    this.gameOver = this.player.isDead();
 
     // Detect collision between meteors and projectiles
     const meteorsAndProjectiles = arrayCrossProduct(this.meteors, this.projectiles);
