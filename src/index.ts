@@ -3,7 +3,7 @@ import { Laser, LaserHit, Player, Projectile } from './game_objects/player';
 import { MeteorSpawner } from './spawners/meteorSpawner';
 import { arrayCrossProduct, drawRoundRect, euclDistance, intersectRayAndCircle } from './util';
 import Images from './images';
-import { ProjectileBurstPower } from './projectileBurstPower';
+import { ProjectileBurstAttack } from './projectileBurstAttack';
 import { Game } from './gameState';
 
 
@@ -38,7 +38,7 @@ async function main(): Promise<void> {
       ) < game.projectileBurstPowerup.size
     ) {
       game.projectileBurstPowerup = null;
-      game.projectileBurstPower = new ProjectileBurstPower(game.player);
+      game.projectileBurstAttack = new ProjectileBurstAttack(game.player);
     } else if (game.player.isProjectileEquipped()) {
       game.player.fireProjectile();
     } else if (game.player.isLaserEquipped()) {
@@ -56,7 +56,7 @@ async function main(): Promise<void> {
     event.preventDefault();
     // TODO
     // game.player.changeWeapon();
-    game.projectileBurstPower.activate();
+    game.projectileBurstAttack.activate();
   });
 
   game.run();

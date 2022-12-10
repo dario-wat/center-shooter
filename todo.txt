@@ -11,3 +11,4 @@
 [x] Meteor destroyed after it hits the player
 [] Fix scoring
 [] Spawn powerups
+[] Make game state static

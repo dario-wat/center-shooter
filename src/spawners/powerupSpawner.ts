@@ -31,7 +31,7 @@ export class ProjectileBurstPowerupSpawner {
   }
 
   shouldSpawn(): boolean {
-    return Game.get().projectileBurstPower === null
+    return Game.get().projectileBurstAttack === null
       && Game.get().projectileBurstPowerup === null
       && (
         FORCE_POWERUP

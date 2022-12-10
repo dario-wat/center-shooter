@@ -3,7 +3,7 @@ import { Laser, LaserHit, Player, Projectile } from './game_objects/player';
 import { MeteorSpawner } from './spawners/meteorSpawner';
 import { arrayCrossProduct, drawRoundRect, euclDistance, intersectRayAndCircle } from './util';
 import Images from './images';
-import { ProjectileBurstPower } from './projectileBurstPower';
+import { ProjectileBurstAttack } from './projectileBurstAttack';
 import { ProjectileBurstPowerupSpawner } from './spawners/powerupSpawner';
 
 export class Game {
@@ -22,7 +22,7 @@ export class Game {
   public score: number = 0;
 
   // Powers
-  public projectileBurstPower: ProjectileBurstPower | null = null;
+  public projectileBurstAttack: ProjectileBurstAttack | null = null;
 
   // Game objects in the scene
   public player: Player;
@@ -91,8 +91,8 @@ export class Game {
 
     // Draw projectile burst power
     if (
-      this.projectileBurstPower !== null
-      && !this.projectileBurstPower.isActive
+      this.projectileBurstAttack !== null
+      && !this.projectileBurstAttack.isActive
     ) {
       const powerY = 105;
       const powerSize = 24;
@@ -136,8 +136,8 @@ export class Game {
     this.smokes = this.smokes.filter(smoke => !smoke.isDead());
 
     // Cleanup projectile burst
-    if (this.projectileBurstPower?.isDead()) {
-      this.projectileBurstPower = null;
+    if (this.projectileBurstAttack?.isDone()) {
+      this.projectileBurstAttack = null;
     }
   }
 
@@ -152,7 +152,7 @@ export class Game {
       this.projectileBurstPowerupSpawner.spawn();
     }
 
-    this.projectileBurstPower?.use();
+    this.projectileBurstAttack?.use();
   }
 
   collision(): void {
