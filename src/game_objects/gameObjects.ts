@@ -134,3 +134,29 @@ export class Smoke extends AnimatedObject {
     return Date.now() - this.createdTimestamp > this.ttl;
   }
 }
+
+export class ProjectileBurstPowerup extends AnimatedObject {
+
+  constructor(
+    public x: number,
+    public y: number,
+    public size: number = 20,
+  ) {
+    super();
+  }
+
+  draw(ctx: CanvasRenderingContext2D): void {
+    // TODO
+    ctx.drawImage(
+      Images.POWERUP_RED_STAR,
+      this.x - this.size,
+      this.y - this.size,
+      this.size * 2,
+      this.size * 2,
+    );
+  }
+
+  update(dt: number): void {
+    // Do nothing
+  }
+}

@@ -1,5 +1,6 @@
-import { Meteor } from './game_objects/gameObjects';
-import { Player } from './game_objects/player';
+import { Game } from '../gameState';
+import { Meteor } from '../game_objects/gameObjects';
+import { Player } from '../game_objects/player';
 
 const MIN_INTERVAL = 500;
 const MAX_INTERVAL = 2000;
@@ -26,7 +27,7 @@ export class MeteorSpawner {
     return Date.now() - this.lastSpawnTimestamp > this.nextSpawnInterval;
   }
 
-  spawn(): Meteor {
+  spawn(): void {
     const velocity = Math.random() * (MAX_VELOCITY - MIN_VELOCITY) + MIN_VELOCITY;
     const hp = Math.random() * (MAX_HP - MIN_HP) + MIN_HP;
 
@@ -59,6 +60,6 @@ export class MeteorSpawner {
     this.lastSpawnTimestamp = Date.now();
     this.nextSpawnInterval = Math.random() * (MAX_INTERVAL - MIN_INTERVAL) + MIN_INTERVAL;
 
-    return new Meteor(x, y, hp, velocity, angle);
+    Game.get().meteors.push(new Meteor(x, y, hp, velocity, angle));
   }
 }

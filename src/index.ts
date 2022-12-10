@@ -1,6 +1,6 @@
 import { Meteor, Smoke } from './game_objects/gameObjects';
 import { Laser, LaserHit, Player, Projectile } from './game_objects/player';
-import { MeteorSpawner } from './meteorSpawner';
+import { MeteorSpawner } from './spawners/meteorSpawner';
 import { arrayCrossProduct, drawRoundRect, euclDistance, intersectRayAndCircle } from './util';
 import Images from './images';
 import { ProjectileBurstPower } from './projectileBurstPower';
@@ -39,8 +39,7 @@ async function main(): Promise<void> {
 
     // New projectile at player position moving towards the mouse click
     if (game.player.isProjectileEquipped()) {
-      const projectile = game.player.fireProjectile();
-      game.projectiles.push(projectile);
+      game.player.fireProjectile();
     }
   });
 

@@ -1,15 +1,17 @@
-import { Meteor, Smoke } from './game_objects/gameObjects';
+import { Meteor, ProjectileBurstPowerup, Smoke } from './game_objects/gameObjects';
 import { Laser, LaserHit, Player, Projectile } from './game_objects/player';
-import { MeteorSpawner } from './meteorSpawner';
+import { MeteorSpawner } from './spawners/meteorSpawner';
 import { arrayCrossProduct, drawRoundRect, euclDistance, intersectRayAndCircle } from './util';
 import Images from './images';
 import { ProjectileBurstPower } from './projectileBurstPower';
+import { ProjectileBurstPowerupSpawner } from './spawners/powerupSpawner';
 
 export class Game {
 
   private static game: Game;
 
   private readonly meteorSpawner: MeteorSpawner;
+  private readonly projectileBurstPowerupSpawner: ProjectileBurstPowerupSpawner;
 
   public canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
@@ -27,6 +29,7 @@ export class Game {
   public projectiles: Projectile[] = [];
   public meteors: Meteor[] = [];
   public smokes: Smoke[] = [];
+  public projectileBurstPowerup: ProjectileBurstPowerup | null = null;
 
   private constructor() {
     // Create canvas
@@ -35,11 +38,12 @@ export class Game {
     this.canvas.height = window.innerHeight;
     this.ctx = this.canvas.getContext('2d')!;
 
-    this.player = new Player(this, this.canvas.width / 2, this.canvas.height / 2);
+    this.player = new Player(this.canvas.width / 2, this.canvas.height / 2);
     this.meteorSpawner = new MeteorSpawner(this.canvas.width, this.canvas.height, this.player);
+    this.projectileBurstPowerupSpawner = new ProjectileBurstPowerupSpawner(this.canvas.width, this.canvas.height, this.player);
 
     // TODO start with projectile burst power
-    this.projectileBurstPower = new ProjectileBurstPower(this.player);
+    // this.projectileBurstPower = new ProjectileBurstPower(this.player);
   }
 
   public static get(): Game {
@@ -61,6 +65,7 @@ export class Game {
     this.meteors.forEach(meteor => meteor.draw(this.ctx));
     this.smokes.forEach(smoke => smoke.draw(this.ctx));
     this.player.draw(this.ctx);
+    this.projectileBurstPowerup?.draw(this.ctx);
 
     const uiXOffset = 20;
 
@@ -139,7 +144,12 @@ export class Game {
   spawn(): void {
     // Run all spawners
     if (this.meteorSpawner.shouldSpawn()) {
-      this.meteors.push(this.meteorSpawner.spawn());
+      this.meteorSpawner.spawn();
+    }
+
+    // Spawn projectile burst powerup
+    if (this.projectileBurstPowerupSpawner.shouldSpawn()) {
+      this.projectileBurstPowerupSpawner.spawn();
     }
 
     this.projectileBurstPower?.use();

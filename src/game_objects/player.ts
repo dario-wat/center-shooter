@@ -1,6 +1,6 @@
 import { drawCircle, euclDistance } from '../util';
 import Images from '../images';
-import { DEBUG_COLLISIONS } from '../config';
+import { DEBUG_COLLISIONS, INVINCIBILITY } from '../config';
 import { AnimatedObject } from './animatedObject';
 import { Game } from '../gameState';
 
@@ -20,7 +20,6 @@ export class Player extends AnimatedObject {
   public laser: Laser;
 
   constructor(
-    private game: Game,
     public x: number,
     public y: number,
     public size: number = 50,
@@ -78,7 +77,8 @@ export class Player extends AnimatedObject {
   }
 
   isInvincible(): boolean {
-    return Date.now() - this.lastHitTimestamp < Player.INVINCIBILITY_DURATION;
+    return INVINCIBILITY
+      || Date.now() - this.lastHitTimestamp < Player.INVINCIBILITY_DURATION;
   }
 
   // Run this when player gets hit
@@ -91,8 +91,8 @@ export class Player extends AnimatedObject {
   }
 
   // Spawns new projectile in the direction where the player is facing
-  fireProjectile(): Projectile {
-    return new Projectile(this.x, this.y, this.angle);
+  fireProjectile(): void {
+    Game.get().projectiles.push(new Projectile(this.x, this.y, this.angle));
   }
 
   fireProjectileBurst(): void {
@@ -103,7 +103,7 @@ export class Player extends AnimatedObject {
       const angle = this.angle + (i - numProjectiles / 2) * angleOffset;
       projectiles.push(new Projectile(this.x, this.y, angle));
     }
-    this.game.projectiles.push(...projectiles);
+    Game.get().projectiles.push(...projectiles);
   }
 
   changeWeapon(): void {
