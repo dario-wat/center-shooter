@@ -5,6 +5,7 @@ import { arrayCrossProduct, drawRoundRect, euclDistance, intersectRayAndCircle }
 import Images from './images';
 import { ProjectileBurstAttack } from './specialAttacks';
 import { PowerupSpawner } from './spawners/powerupSpawner';
+import { drawLives, drawProjectileBurstPower, drawScore, drawWeaponUpgradeRemainingTime } from './drawHud';
 
 export class Game {
 
@@ -69,60 +70,28 @@ export class Game {
     const uiXOffset = 20;
     const uiYOffset = 40;
 
-    // Draw score
-    this.ctx.font = '24px Arial';
-    this.ctx.fillStyle = 'white';
-    this.ctx.fillText(`Score: ${this.score}`, uiXOffset, uiYOffset);
+    drawScore(this.ctx, uiXOffset, uiYOffset, this.score);
 
-    // Draw lives
-    const lifeSize = 24;
-    const lifePadding = 10;
-    const lifeY = 60;
-    for (let i = 0; i < this.player.lives; i++) {
-      this.ctx.drawImage(
-        Images.SHIP,
-        uiXOffset + i * (lifeSize + lifePadding),
-        lifeY,
-        lifeSize,
-        lifeSize,
-      );
-    }
+    const lifeY = 20;
+    drawLives(this.ctx, uiXOffset, uiYOffset + lifeY, this.player.lives);
 
     // Draw projectile burst power
     if (
       this.projectileBurstAttack !== null
       && !this.projectileBurstAttack.isActive
     ) {
-      const powerY = 105;
-      const powerSize = 24;
-      this.ctx.drawImage(
-        Images.POWERUP_RED_STAR,
-        uiXOffset,
-        powerY,
-        powerSize,
-        powerSize,
-      );
+      const powerY = 65;
+      drawProjectileBurstPower(this.ctx, uiXOffset, uiYOffset + powerY);
     }
 
     // Draw weapon upgrade remaining time
     if (this.player.isWeaponUpgraded()) {
       const weaponUpgradeX = 180;
-      const powerSize = 24;
-      this.ctx.drawImage(
-        Images.POWERUP_YELLOW_BOLT,
+      drawWeaponUpgradeRemainingTime(
+        this.ctx,
         uiXOffset + weaponUpgradeX,
-        uiYOffset - powerSize + 4,
-        powerSize,
-        powerSize,
-      );
-
-      const weaponUpgradeTimeLeftX = 215;
-      this.ctx.font = '24px Arial';
-      this.ctx.fillStyle = 'white';
-      this.ctx.fillText(
-        (this.player.getWeaponUpgradeTimeLeft() / 1000).toFixed(1),
-        uiXOffset + weaponUpgradeTimeLeftX,
         uiYOffset,
+        this.player.getWeaponUpgradeTimeLeft(),
       );
     }
   }
