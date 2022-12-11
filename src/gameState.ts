@@ -203,7 +203,7 @@ export class Game {
         if (intersection !== null) {
           const distance = euclDistance(this.player.x, this.player.y, intersection.x, intersection.y);
           if (distance < distanceToMeteor) {
-            this.player.laser.hit = new LaserHit(intersection.x, intersection.y);
+            this.player.laser.hit = new LaserHit(intersection.x, intersection.y, this.player);
             distanceToMeteor = distance;
             meteorToHit = meteor;
           }
@@ -211,7 +211,8 @@ export class Game {
       });
     }
 
-    meteorToHit?.takeDamage(Laser.DPS / 60);
+    // TODO needs to be fixed
+    meteorToHit?.takeDamage(this.player.laser.getDps() / 60);
     if (meteorToHit?.isDead()) {
       this.meteors = this.meteors.filter(m => m !== meteorToHit);
       this.smokes.push(new Smoke(meteorToHit.x, meteorToHit.y));

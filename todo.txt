@@ -1,6 +1,6 @@
 [x] Multiple weapon types
 [x] Laser collisions and damage
-[] Weapon upgrades with timers
+[x] Weapon upgrades with timers
 [] Game becomes more difficult over time
 [x] Special attack rockets
 [] Another special attack

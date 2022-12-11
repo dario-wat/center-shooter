@@ -194,12 +194,17 @@ export class Projectile extends AnimatedObject {
 export class Laser extends AnimatedObject {
 
   public static readonly DPS = 120;
+  public static readonly UPGRADED_DPS = 300;
 
   public isActive: boolean = false;
   public hit: LaserHit | null = null;
 
   constructor(private player: Player) {
     super();
+  }
+
+  getDps(): number {
+    return this.player.isWeaponUpgraded() ? Laser.UPGRADED_DPS : Laser.DPS;
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
@@ -214,7 +219,7 @@ export class Laser extends AnimatedObject {
     const laserLength = this.hit
       ? euclDistance(this.hit.x, this.hit.y, this.player.x, this.player.y)
       : 1000;
-    const laserWidth = 10;
+    const laserWidth = this.player.isWeaponUpgraded() ? 30 : 10;
     ctx.drawImage(
       Images.LASER,
       -5,   // No clue why, but need this to center the laser
@@ -237,21 +242,27 @@ export class Laser extends AnimatedObject {
 
 export class LaserHit extends AnimatedObject {
 
+  private static readonly SIZE = 20;
+  private static readonly UPGRADED_SIZE = 40;
+
   constructor(
     public x: number,
     public y: number,
-    public size: number = 20,
+    private player: Player,
   ) {
     super();
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
+    const size = this.player.isWeaponUpgraded()
+      ? LaserHit.UPGRADED_SIZE
+      : LaserHit.SIZE;
     ctx.drawImage(
       Images.LASER_HIT,
-      this.x - this.size,
-      this.y - this.size,
-      this.size * 2,
-      this.size * 2,
+      this.x - size,
+      this.y - size,
+      size * 2,
+      size * 2,
     );
   }
 

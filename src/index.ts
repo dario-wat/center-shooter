@@ -1,7 +1,4 @@
-import { Meteor, Smoke } from './game_objects/gameObjects';
-import { Laser, LaserHit, Player, Projectile } from './game_objects/player';
-import { MeteorSpawner } from './spawners/meteorSpawner';
-import { arrayCrossProduct, drawRoundRect, euclDistance, intersectRayAndCircle } from './util';
+import { euclDistance } from './util';
 import Images from './images';
 import { ProjectileBurstAttack } from './specialAttacks';
 import { Game } from './gameState';
@@ -65,8 +62,8 @@ async function main(): Promise<void> {
   game.canvas.addEventListener('contextmenu', (event) => {
     event.preventDefault();
     // TODO
-    // game.player.changeWeapon();
-    game.projectileBurstAttack.activate();
+    game.player.changeWeapon();
+    // game.projectileBurstAttack.activate();
   });
 
   game.run();
