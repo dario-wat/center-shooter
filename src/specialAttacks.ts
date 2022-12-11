@@ -1,8 +1,8 @@
 import { Player } from "./game_objects/player";
 
-const DELAY = 500;
-
 export class ProjectileBurstAttack {
+
+  private static readonly DELAY = 500;
 
   private remainingShots: number = 3;
   private lastShotTimestamp: number = 0;
@@ -16,7 +16,7 @@ export class ProjectileBurstAttack {
     if (
       this.isActive
       && this.remainingShots > 0
-      && Date.now() - this.lastShotTimestamp > DELAY
+      && Date.now() - this.lastShotTimestamp > ProjectileBurstAttack.DELAY
     ) {
       this.remainingShots--;
       this.lastShotTimestamp = Date.now();

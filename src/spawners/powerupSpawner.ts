@@ -1,13 +1,13 @@
 import { FORCE_POWERUP } from "../config";
 import { Game } from "../gameState";
-import { ProjectileBurstPowerup } from "../game_objects/gameObjects";
+import { ProjectileBurstPowerup, WeaponUpgradePowerup } from "../game_objects/gameObjects";
 import { Player } from "../game_objects/player";
 import { euclDistance } from "../util";
 
-export class ProjectileBurstPowerupSpawner {
+export class PowerupSpawner {
 
-  private static readonly MIN_TIME_BETWEEN_SPAWNS = 30000;
-  private static readonly MAX_TIME_BETWEEN_SPAWNS = 60000;
+  private static readonly MIN_TIME_BETWEEN_SPAWNS = 15000;
+  private static readonly MAX_TIME_BETWEEN_SPAWNS = 30000;
 
   private lastSpawnTimestamp: number;
   private nextSpawnInterval: number = 0;
@@ -24,15 +24,24 @@ export class ProjectileBurstPowerupSpawner {
 
   resetNextSpawnInterval(): void {
     this.nextSpawnInterval = Math.random() * (
-      ProjectileBurstPowerupSpawner.MAX_TIME_BETWEEN_SPAWNS
-      - ProjectileBurstPowerupSpawner.MIN_TIME_BETWEEN_SPAWNS
+      PowerupSpawner.MAX_TIME_BETWEEN_SPAWNS
+      - PowerupSpawner.MIN_TIME_BETWEEN_SPAWNS
     )
-      + ProjectileBurstPowerupSpawner.MIN_TIME_BETWEEN_SPAWNS;
+      + PowerupSpawner.MIN_TIME_BETWEEN_SPAWNS;
+  }
+
+  private shouldSpawnProjectileBurst(): boolean {
+    return Game.get().projectileBurstAttack === null
+      && Game.get().projectileBurstPowerup === null;
+  }
+
+  private shouldSpawnWeaponUpgrade(): boolean {
+    return Game.get().weaponUpgradePowerup === null
+      && !this.player.isWeaponUpgraded();
   }
 
   shouldSpawn(): boolean {
-    return Game.get().projectileBurstAttack === null
-      && Game.get().projectileBurstPowerup === null
+    return (this.shouldSpawnProjectileBurst() || this.shouldSpawnWeaponUpgrade())
       && (
         FORCE_POWERUP
         || Date.now() - this.lastSpawnTimestamp > this.nextSpawnInterval
@@ -55,6 +64,19 @@ export class ProjectileBurstPowerupSpawner {
       }
     }
 
-    Game.get().projectileBurstPowerup = new ProjectileBurstPowerup(x, y);
+    if (!this.shouldSpawnProjectileBurst()) {
+      Game.get().weaponUpgradePowerup = new WeaponUpgradePowerup(x, y);
+      return;
+    }
+    if (!this.shouldSpawnWeaponUpgrade()) {
+      Game.get().projectileBurstPowerup = new ProjectileBurstPowerup(x, y);
+      return;
+    }
+
+    if (Math.random() < 0.5) {
+      Game.get().projectileBurstPowerup = new ProjectileBurstPowerup(x, y);
+    } else {
+      Game.get().weaponUpgradePowerup = new WeaponUpgradePowerup(x, y);
+    }
   }
 }

@@ -1,17 +1,17 @@
-import { Meteor, ProjectileBurstPowerup, Smoke } from './game_objects/gameObjects';
+import { Meteor, ProjectileBurstPowerup, Smoke, WeaponUpgradePowerup } from './game_objects/gameObjects';
 import { Laser, LaserHit, Player, Projectile } from './game_objects/player';
 import { MeteorSpawner } from './spawners/meteorSpawner';
 import { arrayCrossProduct, drawRoundRect, euclDistance, intersectRayAndCircle } from './util';
 import Images from './images';
-import { ProjectileBurstAttack } from './projectileBurstAttack';
-import { ProjectileBurstPowerupSpawner } from './spawners/powerupSpawner';
+import { ProjectileBurstAttack } from './specialAttacks';
+import { PowerupSpawner } from './spawners/powerupSpawner';
 
 export class Game {
 
   private static game: Game;
 
   private readonly meteorSpawner: MeteorSpawner;
-  private readonly projectileBurstPowerupSpawner: ProjectileBurstPowerupSpawner;
+  private readonly powerupSpawner: PowerupSpawner;
 
   public canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
@@ -30,6 +30,7 @@ export class Game {
   public meteors: Meteor[] = [];
   public smokes: Smoke[] = [];
   public projectileBurstPowerup: ProjectileBurstPowerup | null = null;
+  public weaponUpgradePowerup: WeaponUpgradePowerup | null = null;
 
   private constructor() {
     // Create canvas
@@ -40,7 +41,7 @@ export class Game {
 
     this.player = new Player(this.canvas.width / 2, this.canvas.height / 2);
     this.meteorSpawner = new MeteorSpawner(this.canvas.width, this.canvas.height, this.player);
-    this.projectileBurstPowerupSpawner = new ProjectileBurstPowerupSpawner(this.canvas.width, this.canvas.height, this.player);
+    this.powerupSpawner = new PowerupSpawner(this.canvas.width, this.canvas.height, this.player);
   }
 
   public static get(): Game {
@@ -63,14 +64,15 @@ export class Game {
     this.smokes.forEach(smoke => smoke.draw(this.ctx));
     this.player.draw(this.ctx);
     this.projectileBurstPowerup?.draw(this.ctx);
+    this.weaponUpgradePowerup?.draw(this.ctx);
 
     const uiXOffset = 20;
+    const uiYOffset = 40;
 
     // Draw score
-    const scoreY = 40;
     this.ctx.font = '24px Arial';
     this.ctx.fillStyle = 'white';
-    this.ctx.fillText(`Score: ${this.score}`, uiXOffset, scoreY);
+    this.ctx.fillText(`Score: ${this.score}`, uiXOffset, uiYOffset);
 
     // Draw lives
     const lifeSize = 24;
@@ -101,6 +103,28 @@ export class Game {
         powerSize,
       );
     }
+
+    // Draw weapon upgrade remaining time
+    if (this.player.isWeaponUpgraded()) {
+      const weaponUpgradeX = 180;
+      const powerSize = 24;
+      this.ctx.drawImage(
+        Images.POWERUP_YELLOW_BOLT,
+        uiXOffset + weaponUpgradeX,
+        uiYOffset - powerSize + 4,
+        powerSize,
+        powerSize,
+      );
+
+      const weaponUpgradeTimeLeftX = 215;
+      this.ctx.font = '24px Arial';
+      this.ctx.fillStyle = 'white';
+      this.ctx.fillText(
+        (this.player.getWeaponUpgradeTimeLeft() / 1000).toFixed(1),
+        uiXOffset + weaponUpgradeTimeLeftX,
+        uiYOffset,
+      );
+    }
   }
 
   update(dt: number): void {
@@ -109,6 +133,7 @@ export class Game {
     this.meteors.forEach(meteor => meteor.update(dt));
     this.smokes.forEach(smoke => smoke.update(dt));
     this.projectileBurstPowerup?.update(dt);
+    this.weaponUpgradePowerup?.update(dt);
   }
 
   isOffScreen(x: number, y: number, size: number): boolean {
@@ -145,9 +170,9 @@ export class Game {
       this.meteorSpawner.spawn();
     }
 
-    // Spawn projectile burst powerup
-    if (this.projectileBurstPowerupSpawner.shouldSpawn()) {
-      this.projectileBurstPowerupSpawner.spawn();
+    // Spawn a powerup
+    if (this.powerupSpawner.shouldSpawn()) {
+      this.powerupSpawner.spawn();
     }
 
     this.projectileBurstAttack?.use();

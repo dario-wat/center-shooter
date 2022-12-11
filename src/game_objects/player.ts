@@ -12,8 +12,10 @@ enum WeaponType {
 export class Player extends AnimatedObject {
 
   private static readonly INVINCIBILITY_DURATION = 2000;
+  private static readonly WEAPON_UPGRADE_TIME = 10000;
 
   private activeWeapon: WeaponType = WeaponType.PROJECTILE;
+  public weaponUpgradeStartTime: number = 0;
   public lives: number = 3;
   private lastHitTimestamp: number = 0;
 
@@ -57,7 +59,6 @@ export class Player extends AnimatedObject {
   }
 
   update(dt: number): void {
-    // Player has no updates so only update the laser
     this.laser.update(dt);
   }
 
@@ -82,6 +83,14 @@ export class Player extends AnimatedObject {
       || Date.now() - this.lastHitTimestamp < Player.INVINCIBILITY_DURATION;
   }
 
+  isWeaponUpgraded(): boolean {
+    return Date.now() - this.weaponUpgradeStartTime < Player.WEAPON_UPGRADE_TIME;
+  }
+
+  getWeaponUpgradeTimeLeft(): number {
+    return Player.WEAPON_UPGRADE_TIME - (Date.now() - this.weaponUpgradeStartTime);
+  }
+
   // Run this when player gets hit
   hit(): void {
     if (this.isInvincible()) {
@@ -93,7 +102,18 @@ export class Player extends AnimatedObject {
 
   // Spawns new projectile in the direction where the player is facing
   fireProjectile(): void {
-    Game.get().projectiles.push(new Projectile(this.x, this.y, this.angle));
+    if (!this.isWeaponUpgraded()) {
+      Game.get().projectiles.push(new Projectile(this.x, this.y, this.angle));
+    } else {
+      const angleOffset = 0.3;
+      Game.get().projectiles.push(
+        new Projectile(this.x, this.y, this.angle - 2 * angleOffset),
+        new Projectile(this.x, this.y, this.angle - angleOffset),
+        new Projectile(this.x, this.y, this.angle),
+        new Projectile(this.x, this.y, this.angle + angleOffset),
+        new Projectile(this.x, this.y, this.angle + 2 * angleOffset),
+      );
+    }
   }
 
   fireProjectileBurst(): void {
@@ -113,6 +133,10 @@ export class Player extends AnimatedObject {
     } else {
       this.activeWeapon = WeaponType.PROJECTILE;
     }
+  }
+
+  upgradeWeapon(): void {
+    this.weaponUpgradeStartTime = Date.now();
   }
 }
 

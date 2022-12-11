@@ -3,7 +3,7 @@ import { Laser, LaserHit, Player, Projectile } from './game_objects/player';
 import { MeteorSpawner } from './spawners/meteorSpawner';
 import { arrayCrossProduct, drawRoundRect, euclDistance, intersectRayAndCircle } from './util';
 import Images from './images';
-import { ProjectileBurstAttack } from './projectileBurstAttack';
+import { ProjectileBurstAttack } from './specialAttacks';
 import { Game } from './gameState';
 
 
@@ -28,7 +28,17 @@ async function main(): Promise<void> {
     //   return;
     // }
 
-    if (
+    if (game.weaponUpgradePowerup
+      && euclDistance(
+        game.weaponUpgradePowerup.x,
+        game.weaponUpgradePowerup.y,
+        event.clientX,
+        event.clientY
+      ) < game.weaponUpgradePowerup.size
+    ) {
+      game.weaponUpgradePowerup = null;
+      game.player.upgradeWeapon();
+    } else if (
       game.projectileBurstPowerup
       && euclDistance(
         game.projectileBurstPowerup.x,
