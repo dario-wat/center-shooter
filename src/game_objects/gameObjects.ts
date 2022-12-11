@@ -137,16 +137,20 @@ export class Smoke extends AnimatedObject {
 
 export class ProjectileBurstPowerup extends AnimatedObject {
 
+  private static readonly MIN_SIZE = 15;
+  private static readonly MAX_SIZE = 25;
+
+  private isIncreasing: boolean = true;
+
   constructor(
     public x: number,
     public y: number,
-    public size: number = 20,
+    public size: number = ProjectileBurstPowerup.MIN_SIZE,
   ) {
     super();
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
-    // TODO
     ctx.drawImage(
       Images.POWERUP_RED_STAR,
       this.x - this.size,
@@ -156,7 +160,18 @@ export class ProjectileBurstPowerup extends AnimatedObject {
     );
   }
 
-  update(dt: number): void {
-    // Do nothing
+  update(_dt: number): void {
+    const sizeDelta = 0.3;
+    if (this.isIncreasing) {
+      this.size += sizeDelta;
+      if (this.size >= ProjectileBurstPowerup.MAX_SIZE) {
+        this.isIncreasing = false;
+      }
+    } else {
+      this.size -= sizeDelta;
+      if (this.size <= ProjectileBurstPowerup.MIN_SIZE) {
+        this.isIncreasing = true;
+      }
+    }
   }
 }

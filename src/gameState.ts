@@ -111,6 +111,7 @@ export class Game {
     this.projectiles.forEach(projectile => projectile.update(dt));
     this.meteors.forEach(meteor => meteor.update(dt));
     this.smokes.forEach(smoke => smoke.update(dt));
+    this.projectileBurstPowerup?.update(dt);
   }
 
   isOffScreen(x: number, y: number, size: number): boolean {
