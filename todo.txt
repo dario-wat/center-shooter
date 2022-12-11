@@ -1,6 +1,6 @@
 [x] Multiple weapon types
 [x] Laser collisions and damage
-[] Weapon upgrades
+[] Weapon upgrades with timers
 [] Game becomes more difficult over time
 [x] Special attack rockets
 [] Another special attack
@@ -10,5 +10,5 @@
 [x] Player invulnerable for a second after being hit
 [x] Meteor destroyed after it hits the player
 [] Fix scoring
-[] Spawn powerups
+[x] Spawn powerups
 [] Make game state static

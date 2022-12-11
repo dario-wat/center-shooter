@@ -41,9 +41,6 @@ export class Game {
     this.player = new Player(this.canvas.width / 2, this.canvas.height / 2);
     this.meteorSpawner = new MeteorSpawner(this.canvas.width, this.canvas.height, this.player);
     this.projectileBurstPowerupSpawner = new ProjectileBurstPowerupSpawner(this.canvas.width, this.canvas.height, this.player);
-
-    // TODO start with projectile burst power
-    // this.projectileBurstPower = new ProjectileBurstPower(this.player);
   }
 
   public static get(): Game {
