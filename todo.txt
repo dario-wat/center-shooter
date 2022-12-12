@@ -7,7 +7,7 @@
 [x] Player invulnerable for a second after being hit
 [x] Meteor destroyed after it hits the player
 [x] Spawn powerups
-[] Make game state static
+[x] Make game state static
 [] Game becomes more difficult over time
 [] Another special attack
 [] More intelligent enemies

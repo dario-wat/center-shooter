@@ -60,6 +60,6 @@ export class MeteorSpawner {
     this.lastSpawnTimestamp = Date.now();
     this.nextSpawnInterval = Math.random() * (MAX_INTERVAL - MIN_INTERVAL) + MIN_INTERVAL;
 
-    Game.get().meteors.push(new Meteor(x, y, hp, velocity, angle));
+    Game.meteors.push(new Meteor(x, y, hp, velocity, angle));
   }
 }

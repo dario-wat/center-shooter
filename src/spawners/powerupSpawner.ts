@@ -31,12 +31,12 @@ export class PowerupSpawner {
   }
 
   private shouldSpawnProjectileBurst(): boolean {
-    return Game.get().projectileBurstAttack === null
-      && Game.get().projectileBurstPowerup === null;
+    return Game.projectileBurstAttack === null
+      && Game.projectileBurstPowerup === null;
   }
 
   private shouldSpawnWeaponUpgrade(): boolean {
-    return Game.get().weaponUpgradePowerup === null
+    return Game.weaponUpgradePowerup === null
       && !this.player.isWeaponUpgraded();
   }
 
@@ -65,18 +65,18 @@ export class PowerupSpawner {
     }
 
     if (!this.shouldSpawnProjectileBurst()) {
-      Game.get().weaponUpgradePowerup = new WeaponUpgradePowerup(x, y);
+      Game.weaponUpgradePowerup = new WeaponUpgradePowerup(x, y);
       return;
     }
     if (!this.shouldSpawnWeaponUpgrade()) {
-      Game.get().projectileBurstPowerup = new ProjectileBurstPowerup(x, y);
+      Game.projectileBurstPowerup = new ProjectileBurstPowerup(x, y);
       return;
     }
 
     if (Math.random() < 0.5) {
-      Game.get().projectileBurstPowerup = new ProjectileBurstPowerup(x, y);
+      Game.projectileBurstPowerup = new ProjectileBurstPowerup(x, y);
     } else {
-      Game.get().weaponUpgradePowerup = new WeaponUpgradePowerup(x, y);
+      Game.weaponUpgradePowerup = new WeaponUpgradePowerup(x, y);
     }
   }
 }

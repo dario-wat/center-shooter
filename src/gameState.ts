@@ -1,5 +1,5 @@
 import { Meteor, ProjectileBurstPowerup, Smoke, WeaponUpgradePowerup } from './game_objects/gameObjects';
-import { Laser, LaserHit, Player, Projectile } from './game_objects/player';
+import { LaserHit, Player, Projectile } from './game_objects/player';
 import { MeteorSpawner } from './spawners/meteorSpawner';
 import { arrayCrossProduct, drawRoundRect, euclDistance, intersectRayAndCircle } from './util';
 import Images from './images';
@@ -7,254 +7,246 @@ import { ProjectileBurstAttack } from './specialAttacks';
 import { PowerupSpawner } from './spawners/powerupSpawner';
 import { drawEquippedWeapon, drawLives, drawProjectileBurstPower, drawScore, drawWeaponUpgradeRemainingTime } from './drawHud';
 
-export class Game {
+export abstract class Game {
 
-  private static game: Game;
+  public static meteorSpawner: MeteorSpawner;
+  public static powerupSpawner: PowerupSpawner;
 
-  private readonly meteorSpawner: MeteorSpawner;
-  private readonly powerupSpawner: PowerupSpawner;
+  public static canvas: HTMLCanvasElement;
+  public static ctx: CanvasRenderingContext2D;
 
-  public canvas: HTMLCanvasElement;
-  private ctx: CanvasRenderingContext2D;
+  public static lastTimestamp: number = 0;
 
-  private lastTimestamp: number = 0;
+  public static gameOver: boolean = false;
+  public static score: number = 0;
 
-  public gameOver: boolean = false;
-  public score: number = 0;
-
-  // Powers
-  public projectileBurstAttack: ProjectileBurstAttack | null = null;
+  // Special attacks
+  public static projectileBurstAttack: ProjectileBurstAttack | null = null;
 
   // Game objects in the scene
-  public player: Player;
-  public projectiles: Projectile[] = [];
-  public meteors: Meteor[] = [];
-  public smokes: Smoke[] = [];
-  public projectileBurstPowerup: ProjectileBurstPowerup | null = null;
-  public weaponUpgradePowerup: WeaponUpgradePowerup | null = null;
+  public static player: Player;
+  public static projectiles: Projectile[] = [];
+  public static meteors: Meteor[] = [];
+  public static smokes: Smoke[] = [];
+  public static projectileBurstPowerup: ProjectileBurstPowerup | null = null;
+  public static weaponUpgradePowerup: WeaponUpgradePowerup | null = null;
 
-  private constructor() {
-    // Create canvas
-    this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
-    this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
-    this.ctx = this.canvas.getContext('2d')!;
+}
 
-    this.player = new Player(this.canvas.width / 2, this.canvas.height / 2);
-    this.meteorSpawner = new MeteorSpawner(this.canvas.width, this.canvas.height, this.player);
-    this.powerupSpawner = new PowerupSpawner(this.canvas.width, this.canvas.height, this.player);
+export function initGame(): void {
+  // Create canvas
+  Game.canvas = document.getElementById('canvas') as HTMLCanvasElement;
+  Game.canvas.width = window.innerWidth;
+  Game.canvas.height = window.innerHeight;
+  Game.ctx = Game.canvas.getContext('2d')!;
+
+  Game.player = new Player(Game.canvas.width / 2, Game.canvas.height / 2);
+  Game.meteorSpawner = new MeteorSpawner(Game.canvas.width, Game.canvas.height, Game.player);
+  Game.powerupSpawner = new PowerupSpawner(Game.canvas.width, Game.canvas.height, Game.player);
+}
+
+function draw(): void {
+  Game.ctx.clearRect(0, 0, Game.canvas.width, Game.canvas.height);
+
+  // Tile background
+  const pattern = Game.ctx.createPattern(Images.BLACK_BACKGROUND, 'repeat')!;
+  Game.ctx.fillStyle = pattern;
+  Game.ctx.fillRect(0, 0, Game.canvas.width, Game.canvas.height);
+
+  Game.projectiles.forEach(projectile => projectile.draw(Game.ctx));
+  Game.meteors.forEach(meteor => meteor.draw(Game.ctx));
+  Game.smokes.forEach(smoke => smoke.draw(Game.ctx));
+  Game.player.draw(Game.ctx);
+  Game.projectileBurstPowerup?.draw(Game.ctx);
+  Game.weaponUpgradePowerup?.draw(Game.ctx);
+
+  const uiXOffset = 20;
+  const uiYOffset = 40;
+
+  drawScore(Game.ctx, uiXOffset, uiYOffset, Game.score);
+
+  const lifeY = 20;
+  drawLives(Game.ctx, uiXOffset, uiYOffset + lifeY, Game.player.lives);
+
+  const equippedWeaponY = 65;
+  drawEquippedWeapon(Game.ctx, uiXOffset, uiYOffset + equippedWeaponY, Game.player);
+
+  // Draw projectile burst power
+  if (
+    Game.projectileBurstAttack !== null
+    && !Game.projectileBurstAttack.isActive
+  ) {
+    const powerY = 110;
+    drawProjectileBurstPower(Game.ctx, uiXOffset, uiYOffset + powerY);
   }
 
-  public static get(): Game {
-    if (!Game.game) {
-      Game.game = new Game();
-    }
-    return Game.game;
-  }
-
-  draw(): void {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-    // Tile background
-    const pattern = this.ctx.createPattern(Images.BLACK_BACKGROUND, 'repeat')!;
-    this.ctx.fillStyle = pattern;
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-    this.projectiles.forEach(projectile => projectile.draw(this.ctx));
-    this.meteors.forEach(meteor => meteor.draw(this.ctx));
-    this.smokes.forEach(smoke => smoke.draw(this.ctx));
-    this.player.draw(this.ctx);
-    this.projectileBurstPowerup?.draw(this.ctx);
-    this.weaponUpgradePowerup?.draw(this.ctx);
-
-    const uiXOffset = 20;
-    const uiYOffset = 40;
-
-    drawScore(this.ctx, uiXOffset, uiYOffset, this.score);
-
-    const lifeY = 20;
-    drawLives(this.ctx, uiXOffset, uiYOffset + lifeY, this.player.lives);
-
-    const equippedWeaponY = 65;
-    drawEquippedWeapon(this.ctx, uiXOffset, uiYOffset + equippedWeaponY, this.player);
-
-    // Draw projectile burst power
-    if (
-      this.projectileBurstAttack !== null
-      && !this.projectileBurstAttack.isActive
-    ) {
-      const powerY = 110;
-      drawProjectileBurstPower(this.ctx, uiXOffset, uiYOffset + powerY);
-    }
-
-    // Draw weapon upgrade remaining time
-    if (this.player.isWeaponUpgraded()) {
-      const weaponUpgradeX = 180;
-      drawWeaponUpgradeRemainingTime(
-        this.ctx,
-        uiXOffset + weaponUpgradeX,
-        uiYOffset,
-        this.player.getWeaponUpgradeTimeLeft(),
-      );
-    }
-  }
-
-  update(dt: number): void {
-    this.player.update(dt);
-    this.projectiles.forEach(projectile => projectile.update(dt));
-    this.meteors.forEach(meteor => meteor.update(dt));
-    this.smokes.forEach(smoke => smoke.update(dt));
-    this.projectileBurstPowerup?.update(dt);
-    this.weaponUpgradePowerup?.update(dt);
-  }
-
-  isOffScreen(x: number, y: number, size: number): boolean {
-    const margin = 200;   // Biggest meteor is around 100px
-    return x < -margin
-      || x > this.canvas.width + margin
-      || y < -margin
-      || y > this.canvas.height + margin;
-  }
-
-  cleanup(): void {
-    // Cleanup meteors that are off screen
-    this.meteors = this.meteors.filter(meteor =>
-      !this.isOffScreen(meteor.x, meteor.y, meteor.size())
+  // Draw weapon upgrade remaining time
+  if (Game.player.isWeaponUpgraded()) {
+    const weaponUpgradeX = 180;
+    drawWeaponUpgradeRemainingTime(
+      Game.ctx,
+      uiXOffset + weaponUpgradeX,
+      uiYOffset,
+      Game.player.getWeaponUpgradeTimeLeft(),
     );
+  }
+}
 
-    // Clenaup projectiles that are off screen
-    this.projectiles = this.projectiles.filter(projectile =>
-      !this.isOffScreen(projectile.x, projectile.y, projectile.size)
-    );
+function update(dt: number): void {
+  Game.player.update(dt);
+  Game.projectiles.forEach(projectile => projectile.update(dt));
+  Game.meteors.forEach(meteor => meteor.update(dt));
+  Game.smokes.forEach(smoke => smoke.update(dt));
+  Game.projectileBurstPowerup?.update(dt);
+  Game.weaponUpgradePowerup?.update(dt);
+}
 
-    // Cleanup dead smokes
-    this.smokes = this.smokes.filter(smoke => !smoke.isDead());
+function isOffScreen(x: number, y: number, size: number): boolean {
+  const offScreenMargin = 100;
+  return x + size < -offScreenMargin
+    || x - size > Game.canvas.width + offScreenMargin
+    || y + size < -offScreenMargin
+    || y - size > Game.canvas.height + offScreenMargin;
+}
 
-    // Cleanup projectile burst
-    if (this.projectileBurstAttack?.isDone()) {
-      this.projectileBurstAttack = null;
-    }
+function cleanup(): void {
+  // Cleanup meteors that are off screen
+  Game.meteors = Game.meteors.filter(meteor =>
+    !isOffScreen(meteor.x, meteor.y, meteor.size())
+  );
+
+  // Clenaup projectiles that are off screen
+  Game.projectiles = Game.projectiles.filter(projectile =>
+    !isOffScreen(projectile.x, projectile.y, projectile.size)
+  );
+
+  // Cleanup dead smokes
+  Game.smokes = Game.smokes.filter(smoke => !smoke.isDead());
+
+  // Cleanup projectile burst
+  if (Game.projectileBurstAttack?.isDone()) {
+    Game.projectileBurstAttack = null;
+  }
+}
+
+function spawn(): void {
+  // Run all spawners
+  if (Game.meteorSpawner.shouldSpawn()) {
+    Game.meteorSpawner.spawn();
   }
 
-  spawn(): void {
-    // Run all spawners
-    if (this.meteorSpawner.shouldSpawn()) {
-      this.meteorSpawner.spawn();
-    }
-
-    // Spawn a powerup
-    if (this.powerupSpawner.shouldSpawn()) {
-      this.powerupSpawner.spawn();
-    }
-
-    this.projectileBurstAttack?.use();
+  // Spawn a powerup
+  if (Game.powerupSpawner.shouldSpawn()) {
+    Game.powerupSpawner.spawn();
   }
 
-  collision(): void {
-    // Detect collision between player and meteors
-    const meteorPlayerHits = this.meteors.filter(meteor => {
-      const distance = euclDistance(this.player.x, this.player.y, meteor.x, meteor.y);
-      return distance < this.player.size + meteor.size();
+  Game.projectileBurstAttack?.use();
+}
+
+function collision(): void {
+  // Detect collision between player and meteors
+  const meteorPlayerHits = Game.meteors.filter(meteor => {
+    const distance = euclDistance(Game.player.x, Game.player.y, meteor.x, meteor.y);
+    return distance < Game.player.size + meteor.size();
+  });
+  if (meteorPlayerHits.length > 0) {
+    // Remove meteors that hit the player
+    Game.meteors = Game.meteors.filter(meteor => !meteorPlayerHits.includes(meteor));
+    meteorPlayerHits.forEach(meteor => {
+      Game.smokes.push(new Smoke(meteor.x, meteor.y));
     });
-    if (meteorPlayerHits.length > 0) {
-      // Remove meteors that hit the player
-      this.meteors = this.meteors.filter(meteor => !meteorPlayerHits.includes(meteor));
-      meteorPlayerHits.forEach(meteor => {
-        this.smokes.push(new Smoke(meteor.x, meteor.y));
-      });
-      this.score += meteorPlayerHits.length * 10;
-      this.player.hit();
+    Game.score += meteorPlayerHits.length * 10;
+    Game.player.hit();
+  }
+  Game.gameOver = Game.player.isDead();
+
+  // Detect collision between meteors and projectiles
+  const meteorsAndProjectiles = arrayCrossProduct(Game.meteors, Game.projectiles);
+  meteorsAndProjectiles.forEach(([meteor, projectile]) => {
+    const dx = meteor.x - projectile.x;
+    const dy = meteor.y - projectile.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance < meteor.size() + projectile.size) {
+      // If the projectile hits the meteor increase the score
+      Game.score += 10;
+
+      meteor.takeDamage(Projectile.DAMAGE);
+      // Remove or downsize the meteor
+      if (meteor.isDead()) {
+        // Add smoke where the meteor was
+        Game.smokes.push(new Smoke(meteor.x, meteor.y));
+        Game.meteors = Game.meteors.filter(m => m !== meteor);
+      }
+
+      // Remove the projectile
+      Game.projectiles = Game.projectiles.filter(p => p !== projectile);
     }
-    this.gameOver = this.player.isDead();
+  });
 
-    // Detect collision between meteors and projectiles
-    const meteorsAndProjectiles = arrayCrossProduct(this.meteors, this.projectiles);
-    meteorsAndProjectiles.forEach(([meteor, projectile]) => {
-      const dx = meteor.x - projectile.x;
-      const dy = meteor.y - projectile.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
 
-      if (distance < meteor.size() + projectile.size) {
-        // If the projectile hits the meteor increase the score
-        this.score += 10;
-
-        meteor.takeDamage(Projectile.DAMAGE);
-        // Remove or downsize the meteor
-        if (meteor.isDead()) {
-          // Add smoke where the meteor was
-          this.smokes.push(new Smoke(meteor.x, meteor.y));
-          this.meteors = this.meteors.filter(m => m !== meteor);
+  // Collision between laser and meteors
+  Game.player.laser.hit = null;
+  let distanceToMeteor = Infinity;
+  let meteorToHit: Meteor | null = null;
+  if (Game.player.isLaserFiring()) {
+    Game.meteors.forEach(meteor => {
+      // Circle and line intersection
+      const intersection = intersectRayAndCircle(
+        Game.player.x, Game.player.y, Game.player.angle,
+        meteor.x, meteor.y, meteor.size(),
+      );
+      if (intersection !== null) {
+        const distance = euclDistance(Game.player.x, Game.player.y, intersection.x, intersection.y);
+        if (distance < distanceToMeteor) {
+          Game.player.laser.hit = new LaserHit(intersection.x, intersection.y, Game.player);
+          distanceToMeteor = distance;
+          meteorToHit = meteor;
         }
-
-        // Remove the projectile
-        this.projectiles = this.projectiles.filter(p => p !== projectile);
       }
     });
-
-
-    // Collision between laser and meteors
-    this.player.laser.hit = null;
-    let distanceToMeteor = Infinity;
-    let meteorToHit: Meteor | null = null;
-    if (this.player.isLaserFiring()) {
-      this.meteors.forEach(meteor => {
-        // Circle and line intersection
-        const intersection = intersectRayAndCircle(
-          this.player.x, this.player.y, this.player.angle,
-          meteor.x, meteor.y, meteor.size(),
-        );
-        if (intersection !== null) {
-          const distance = euclDistance(this.player.x, this.player.y, intersection.x, intersection.y);
-          if (distance < distanceToMeteor) {
-            this.player.laser.hit = new LaserHit(intersection.x, intersection.y, this.player);
-            distanceToMeteor = distance;
-            meteorToHit = meteor;
-          }
-        }
-      });
-    }
-
-    // TODO needs to be fixed
-    meteorToHit?.takeDamage(this.player.laser.getDps() / 60);
-    if (meteorToHit?.isDead()) {
-      this.meteors = this.meteors.filter(m => m !== meteorToHit);
-      this.smokes.push(new Smoke(meteorToHit.x, meteorToHit.y));
-    }
   }
 
-  run() {
-    requestAnimationFrame(this.run.bind(this));
-
-    // if (this.gameOver) {
-
-    //   drawRoundRect(ctx, canvas.width / 2 - 200, canvas.height / 2 - 100, 400, 200, 20);
-
-    //   ctx.font = '48px Arial';
-    //   ctx.fillStyle = 'black';
-    //   ctx.fillText('Game Over', canvas.width / 2 - 150, canvas.height / 2);
-    //   ctx.font = '24px Arial';
-    //   ctx.fillText('Click to restart', canvas.width / 2 - 100, canvas.height / 2 + 50);
-
-
-    //   return;
-    // }
-
-    // Update objects
-    this.update((Date.now() - this.lastTimestamp) / 1000);
-    this.lastTimestamp = Date.now();
-
-    this.collision();
-
-    // Cleanup off screen objects
-    this.cleanup();
-
-    // Spawn has to be after cleanup otherwise we will clean up
-    // newly spawned meteors
-    // This may cause bugs in the future if we start cleaning up
-    // before meteors enter the screen
-    this.spawn();
-
-    // Draw objects
-    this.draw();
+  // TODO needs to be fixed
+  meteorToHit?.takeDamage(Game.player.laser.getDps() / 60);
+  if (meteorToHit?.isDead()) {
+    Game.meteors = Game.meteors.filter(m => m !== meteorToHit);
+    Game.smokes.push(new Smoke(meteorToHit.x, meteorToHit.y));
   }
+}
+
+export function runGameLoop(): void {
+  requestAnimationFrame(runGameLoop);
+
+  // if (Game.gameOver) {
+
+  //   drawRoundRect(ctx, canvas.width / 2 - 200, canvas.height / 2 - 100, 400, 200, 20);
+
+  //   ctx.font = '48px Arial';
+  //   ctx.fillStyle = 'black';
+  //   ctx.fillText('Game Over', canvas.width / 2 - 150, canvas.height / 2);
+  //   ctx.font = '24px Arial';
+  //   ctx.fillText('Click to restart', canvas.width / 2 - 100, canvas.height / 2 + 50);
+
+
+  //   return;
+  // }
+
+  // Update objects
+  update((Date.now() - Game.lastTimestamp) / 1000);
+  Game.lastTimestamp = Date.now();
+
+  collision();
+
+  // Cleanup off screen objects
+  cleanup();
+
+  // Spawn has to be after cleanup otherwise we will clean up
+  // newly spawned meteors
+  // Game may cause bugs in the future if we start cleaning up
+  // before meteors enter the screen
+  spawn();
+
+  // Draw objects
+  draw();
 }

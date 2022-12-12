@@ -1,78 +1,77 @@
 import { euclDistance } from './util';
 import Images from './images';
 import { ProjectileBurstAttack } from './specialAttacks';
-import { Game } from './gameState';
+import { Game, initGame, runGameLoop } from './gameState';
 
 
 async function main(): Promise<void> {
   await Images.initialize();
+  initGame();
 
-  let game = Game.get();
-
-  game.canvas.addEventListener('mouseup', (event) => {
-    game.player.laser.isActive = false;
+  Game.canvas.addEventListener('mouseup', (event) => {
+    Game.player.laser.isActive = false;
   });
 
   // Spawn projectiles on mouse click
-  game.canvas.addEventListener('mousedown', (event) => {
+  Game.canvas.addEventListener('mousedown', (event) => {
     // Ignore right click
     if (event.button === 2) {
       return;
     }
-    // if (game.gameOver) {
-    //   game = new Game();
-    //   game.run();
+    // if (Game.GameOver) {
+    //   Game = new Game();
+    //   Game.run();
     //   return;
     // }
 
-    if (game.weaponUpgradePowerup
+    if (Game.weaponUpgradePowerup
       && euclDistance(
-        game.weaponUpgradePowerup.x,
-        game.weaponUpgradePowerup.y,
+        Game.weaponUpgradePowerup.x,
+        Game.weaponUpgradePowerup.y,
         event.clientX,
         event.clientY
-      ) < game.weaponUpgradePowerup.size
+      ) < Game.weaponUpgradePowerup.size
     ) {
-      game.weaponUpgradePowerup = null;
-      game.player.upgradeWeapon();
+      Game.weaponUpgradePowerup = null;
+      Game.player.upgradeWeapon();
     } else if (
-      game.projectileBurstPowerup
+      Game.projectileBurstPowerup
       && euclDistance(
-        game.projectileBurstPowerup.x,
-        game.projectileBurstPowerup.y,
+        Game.projectileBurstPowerup.x,
+        Game.projectileBurstPowerup.y,
         event.clientX,
         event.clientY
-      ) < game.projectileBurstPowerup.size
+      ) < Game.projectileBurstPowerup.size
     ) {
-      game.projectileBurstPowerup = null;
-      game.projectileBurstAttack = new ProjectileBurstAttack(game.player);
-    } else if (game.player.isProjectileEquipped()) {
-      game.player.fireProjectile();
-    } else if (game.player.isLaserEquipped()) {
-      game.player.laser.isActive = true;
+      Game.projectileBurstPowerup = null;
+      Game.projectileBurstAttack = new ProjectileBurstAttack(Game.player);
+    } else if (Game.player.isProjectileEquipped()) {
+      Game.player.fireProjectile();
+    } else if (Game.player.isLaserEquipped()) {
+      Game.player.laser.isActive = true;
     }
   });
 
   // Player faces the mouse position
-  game.canvas.addEventListener('mousemove', (event) => {
-    game.player.angle = Math.atan2(event.clientY - game.player.y, event.clientX - game.player.x);
+  Game.canvas.addEventListener('mousemove', (event) => {
+    Game.player.angle = Math.atan2(event.clientY - Game.player.y, event.clientX - Game.player.x);
   });
 
   // Change weapon on right click
-  game.canvas.addEventListener('contextmenu', (event) => {
+  Game.canvas.addEventListener('contextmenu', (event) => {
     event.preventDefault();
-    game.projectileBurstAttack.activate();
+    Game.projectileBurstAttack.activate();
   });
 
   // Change weapon on scroll
-  game.canvas.addEventListener('wheel', (event) => {
+  Game.canvas.addEventListener('wheel', (event) => {
     event.preventDefault();
     if (event.deltaY > 0) {
-      game.player.changeWeapon();
+      Game.player.changeWeapon();
     }
   });
 
-  game.run();
+  runGameLoop();
 }
 
 main();

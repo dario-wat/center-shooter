@@ -108,10 +108,10 @@ export class Player extends AnimatedObject {
     const y = this.y + offset * Math.sin(this.angle);
 
     if (!this.isWeaponUpgraded()) {
-      Game.get().projectiles.push(new Projectile(x, y, this.angle));
+      Game.projectiles.push(new Projectile(x, y, this.angle));
     } else {
       const angleOffset = 0.3;
-      Game.get().projectiles.push(
+      Game.projectiles.push(
         new Projectile(x, y, this.angle - 2 * angleOffset),
         new Projectile(x, y, this.angle - angleOffset),
         new Projectile(x, y, this.angle),
@@ -129,7 +129,7 @@ export class Player extends AnimatedObject {
       const angle = this.angle + (i - numProjectiles / 2) * angleOffset;
       projectiles.push(new Projectile(this.x, this.y, angle));
     }
-    Game.get().projectiles.push(...projectiles);
+    Game.projectiles.push(...projectiles);
   }
 
   changeWeapon(): void {
