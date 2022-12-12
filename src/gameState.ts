@@ -6,6 +6,7 @@ import Images from './images';
 import { ProjectileBurstAttack } from './specialAttacks';
 import { PowerupSpawner } from './spawners/powerupSpawner';
 import { drawEquippedWeapon, drawLives, drawProjectileBurstPower, drawScore, drawWeaponUpgradeRemainingTime } from './drawHud';
+import { collideLaserWithMeteors, collidePlayerWithMeteors, collideProjectilesAndMeteors } from './collisions';
 
 export abstract class Game {
 
@@ -143,76 +144,10 @@ function spawn(): void {
   Game.projectileBurstAttack?.use();
 }
 
-function collision(): void {
-  // Detect collision between player and meteors
-  const meteorPlayerHits = Game.meteors.filter(meteor => {
-    const distance = euclDistance(Game.player.x, Game.player.y, meteor.x, meteor.y);
-    return distance < Game.player.size + meteor.size();
-  });
-  if (meteorPlayerHits.length > 0) {
-    // Remove meteors that hit the player
-    Game.meteors = Game.meteors.filter(meteor => !meteorPlayerHits.includes(meteor));
-    meteorPlayerHits.forEach(meteor => {
-      Game.smokes.push(new Smoke(meteor.x, meteor.y));
-    });
-    Game.score += meteorPlayerHits.length * 10;
-    Game.player.hit();
-  }
-  Game.gameOver = Game.player.isDead();
-
-  // Detect collision between meteors and projectiles
-  const meteorsAndProjectiles = arrayCrossProduct(Game.meteors, Game.projectiles);
-  meteorsAndProjectiles.forEach(([meteor, projectile]) => {
-    const dx = meteor.x - projectile.x;
-    const dy = meteor.y - projectile.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    if (distance < meteor.size() + projectile.size) {
-      // If the projectile hits the meteor increase the score
-      Game.score += 10;
-
-      meteor.takeDamage(Projectile.DAMAGE);
-      // Remove or downsize the meteor
-      if (meteor.isDead()) {
-        // Add smoke where the meteor was
-        Game.smokes.push(new Smoke(meteor.x, meteor.y));
-        Game.meteors = Game.meteors.filter(m => m !== meteor);
-      }
-
-      // Remove the projectile
-      Game.projectiles = Game.projectiles.filter(p => p !== projectile);
-    }
-  });
-
-
-  // Collision between laser and meteors
-  Game.player.laser.hit = null;
-  let distanceToMeteor = Infinity;
-  let meteorToHit: Meteor | null = null;
-  if (Game.player.isLaserFiring()) {
-    Game.meteors.forEach(meteor => {
-      // Circle and line intersection
-      const intersection = intersectRayAndCircle(
-        Game.player.x, Game.player.y, Game.player.angle,
-        meteor.x, meteor.y, meteor.size(),
-      );
-      if (intersection !== null) {
-        const distance = euclDistance(Game.player.x, Game.player.y, intersection.x, intersection.y);
-        if (distance < distanceToMeteor) {
-          Game.player.laser.hit = new LaserHit(intersection.x, intersection.y, Game.player);
-          distanceToMeteor = distance;
-          meteorToHit = meteor;
-        }
-      }
-    });
-  }
-
-  // TODO needs to be fixed
-  meteorToHit?.takeDamage(Game.player.laser.getDps() / 60);
-  if (meteorToHit?.isDead()) {
-    Game.meteors = Game.meteors.filter(m => m !== meteorToHit);
-    Game.smokes.push(new Smoke(meteorToHit.x, meteorToHit.y));
-  }
+function collision(dt: number): void {
+  collidePlayerWithMeteors();
+  collideProjectilesAndMeteors();
+  collideLaserWithMeteors(dt);
 }
 
 export function runGameLoop(): void {
@@ -233,10 +168,11 @@ export function runGameLoop(): void {
   // }
 
   // Update objects
-  update((Date.now() - Game.lastTimestamp) / 1000);
+  const dt = (Date.now() - Game.lastTimestamp) / 1000;
+  update(dt);
   Game.lastTimestamp = Date.now();
 
-  collision();
+  collision(dt);
 
   // Cleanup off screen objects
   cleanup();

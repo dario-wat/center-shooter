@@ -64,8 +64,10 @@ export class Meteor extends AnimatedObject {
     this.y += this.velocity * Math.sin(this.angle) * dt;
   }
 
-  takeDamage(damage: number): void {
+  takeDamage(damage: number): number {
+    const damageTaken = Math.min(this.hp, damage);
     this.hp -= damage;
+    return damageTaken;
   }
 
   size(): number {

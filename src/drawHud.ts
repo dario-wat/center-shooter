@@ -9,7 +9,7 @@ export function drawScore(
 ): void {
   ctx.font = '24px Arial';
   ctx.fillStyle = 'white';
-  ctx.fillText(`Score: ${score}`, x, y);
+  ctx.fillText(`Score: ${score.toFixed(0)}`, x, y);
 }
 
 export function drawLives(
