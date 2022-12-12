@@ -198,8 +198,8 @@ export class Projectile extends AnimatedObject {
 
 export class Laser extends AnimatedObject {
 
-  public static readonly DPS = 120;
-  public static readonly UPGRADED_DPS = 300;
+  public static readonly DPS = 180;
+  public static readonly UPGRADED_DPS = 360;
 
   public isActive: boolean = false;
   public hit: LaserHit | null = null;

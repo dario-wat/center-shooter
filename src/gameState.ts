@@ -164,6 +164,7 @@ function collision(dt: number): void {
 export function runGameLoop(): void {
   requestAnimationFrame(runGameLoop);
 
+  // TODO
   // if (Game.gameOver) {
 
   //   drawRoundRect(ctx, canvas.width / 2 - 200, canvas.height / 2 - 100, 400, 200, 20);
