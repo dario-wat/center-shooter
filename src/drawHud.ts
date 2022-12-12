@@ -1,3 +1,4 @@
+import { Game } from "./gameState";
 import { Player } from "./game_objects/player";
 import Images from "./images";
 
@@ -84,4 +85,15 @@ export function drawEquippedWeapon(
   } else {
     ctx.drawImage(Images.PROJECTILE, x, y, size, size);
   }
+}
+
+export function drawDifficultyMultiplier(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  difficulty: number,
+): void {
+  ctx.font = '24px Arial';
+  ctx.fillStyle = 'white';
+  ctx.fillText(`Difficulty: ${difficulty}`, x, y);
 }

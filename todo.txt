@@ -8,7 +8,7 @@
 [x] Meteor destroyed after it hits the player
 [x] Spawn powerups
 [x] Make game state static
-[] Game becomes more difficult over time
+[x] Game becomes more difficult over time
+[x] Fix scoring
 [] Another special attack
 [] More intelligent enemies
-[] Fix scoring

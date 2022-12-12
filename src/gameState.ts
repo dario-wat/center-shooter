@@ -5,8 +5,9 @@ import { arrayCrossProduct, drawRoundRect, euclDistance, intersectRayAndCircle }
 import Images from './images';
 import { ProjectileBurstAttack } from './specialAttacks';
 import { PowerupSpawner } from './spawners/powerupSpawner';
-import { drawEquippedWeapon, drawLives, drawProjectileBurstPower, drawScore, drawWeaponUpgradeRemainingTime } from './drawHud';
+import { drawDifficultyMultiplier, drawEquippedWeapon, drawLives, drawProjectileBurstPower, drawScore, drawWeaponUpgradeRemainingTime } from './drawHud';
 import { collideLaserWithMeteors, collidePlayerWithMeteors, collideProjectilesAndMeteors } from './collisions';
+import { DEBUG_DIFFICULTY } from './config';
 
 export abstract class Game {
 
@@ -89,6 +90,16 @@ function draw(): void {
       uiXOffset + weaponUpgradeX,
       uiYOffset,
       Game.player.getWeaponUpgradeTimeLeft(),
+    );
+  }
+
+  if (DEBUG_DIFFICULTY) {
+    const difficultyMultiplierXOffset = 300;
+    drawDifficultyMultiplier(
+      Game.ctx,
+      Game.canvas.width - difficultyMultiplierXOffset,
+      uiYOffset,
+      Game.meteorSpawner.getDifficultyMultiplier(),
     );
   }
 }

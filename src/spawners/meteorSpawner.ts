@@ -5,6 +5,9 @@ import { Player } from '../game_objects/player';
 const MIN_INTERVAL = 500;
 const MAX_INTERVAL = 2000;
 
+const INCREASE_DIFFICULTY_INTERVAL = 10000;
+const MAX_DIFFICULTY_MULTIPLIER = 5;  // Might need to be higher
+
 const MIN_VELOCITY = 50;
 const MAX_VELOCITY = 200;
 
@@ -16,6 +19,8 @@ export class MeteorSpawner {
   private lastSpawnTimestamp: number = 0;
   private nextSpawnInterval: number = 0;
 
+  private startTime: number = Date.now();
+
   constructor(
     private canvasWidth: number,
     private canvasHeight: number,
@@ -25,6 +30,13 @@ export class MeteorSpawner {
 
   shouldSpawn(): boolean {
     return Date.now() - this.lastSpawnTimestamp > this.nextSpawnInterval;
+  }
+
+  getDifficultyMultiplier(): number {
+    return Math.min(
+      Math.floor((Date.now() - this.startTime) / INCREASE_DIFFICULTY_INTERVAL),
+      MAX_DIFFICULTY_MULTIPLIER,
+    );
   }
 
   spawn(): void {
@@ -58,7 +70,10 @@ export class MeteorSpawner {
     const angle = Math.atan2(this.player.y - y, this.player.x - x);
 
     this.lastSpawnTimestamp = Date.now();
-    this.nextSpawnInterval = Math.random() * (MAX_INTERVAL - MIN_INTERVAL) + MIN_INTERVAL;
+    const difficultyMultiplier = this.getDifficultyMultiplier();
+    const minInterval = MIN_INTERVAL * (1 - difficultyMultiplier / 10);
+    const maxInterval = MAX_INTERVAL * (1 - difficultyMultiplier / 10);
+    this.nextSpawnInterval = Math.random() * (maxInterval - minInterval) + minInterval;
 
     Game.meteors.push(new Meteor(x, y, hp, velocity, angle));
   }
