@@ -61,9 +61,15 @@ async function main(): Promise<void> {
   // Change weapon on right click
   game.canvas.addEventListener('contextmenu', (event) => {
     event.preventDefault();
-    // TODO
-    game.player.changeWeapon();
-    // game.projectileBurstAttack.activate();
+    game.projectileBurstAttack.activate();
+  });
+
+  // Change weapon on scroll
+  game.canvas.addEventListener('wheel', (event) => {
+    event.preventDefault();
+    if (event.deltaY > 0) {
+      game.player.changeWeapon();
+    }
   });
 
   game.run();

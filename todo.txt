@@ -1,14 +1,14 @@
 [x] Multiple weapon types
 [x] Laser collisions and damage
 [x] Weapon upgrades with timers
-[] Game becomes more difficult over time
 [x] Special attack rockets
-[] Another special attack
 [x] Background space
-[] More intelligent enemies
 [x] Spawn meteors based on HP
 [x] Player invulnerable for a second after being hit
 [x] Meteor destroyed after it hits the player
-[] Fix scoring
 [x] Spawn powerups
 [] Make game state static
+[] Game becomes more difficult over time
+[] Another special attack
+[] More intelligent enemies
+[] Fix scoring

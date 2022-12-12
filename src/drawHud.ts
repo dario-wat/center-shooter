@@ -1,3 +1,4 @@
+import { Player } from "./game_objects/player";
 import Images from "./images";
 
 export function drawScore(
@@ -69,4 +70,18 @@ export function drawWeaponUpgradeRemainingTime(
     x + timeLeftX,
     y,
   );
+}
+
+export function drawEquippedWeapon(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  player: Player,
+): void {
+  const size = 24;
+  if (player.isLaserEquipped()) {
+    ctx.drawImage(Images.LASER_HIT, x, y, size, size);
+  } else {
+    ctx.drawImage(Images.PROJECTILE, x, y, size, size);
+  }
 }

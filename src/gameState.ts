@@ -5,7 +5,7 @@ import { arrayCrossProduct, drawRoundRect, euclDistance, intersectRayAndCircle }
 import Images from './images';
 import { ProjectileBurstAttack } from './specialAttacks';
 import { PowerupSpawner } from './spawners/powerupSpawner';
-import { drawLives, drawProjectileBurstPower, drawScore, drawWeaponUpgradeRemainingTime } from './drawHud';
+import { drawEquippedWeapon, drawLives, drawProjectileBurstPower, drawScore, drawWeaponUpgradeRemainingTime } from './drawHud';
 
 export class Game {
 
@@ -75,12 +75,15 @@ export class Game {
     const lifeY = 20;
     drawLives(this.ctx, uiXOffset, uiYOffset + lifeY, this.player.lives);
 
+    const equippedWeaponY = 65;
+    drawEquippedWeapon(this.ctx, uiXOffset, uiYOffset + equippedWeaponY, this.player);
+
     // Draw projectile burst power
     if (
       this.projectileBurstAttack !== null
       && !this.projectileBurstAttack.isActive
     ) {
-      const powerY = 65;
+      const powerY = 110;
       drawProjectileBurstPower(this.ctx, uiXOffset, uiYOffset + powerY);
     }
 

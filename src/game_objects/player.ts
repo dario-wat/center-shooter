@@ -102,16 +102,21 @@ export class Player extends AnimatedObject {
 
   // Spawns new projectile in the direction where the player is facing
   fireProjectile(): void {
+    // Move x and y a bit to avoid spawning projectiles inside the player
+    const offset = this.size;
+    const x = this.x + offset * Math.cos(this.angle);
+    const y = this.y + offset * Math.sin(this.angle);
+
     if (!this.isWeaponUpgraded()) {
-      Game.get().projectiles.push(new Projectile(this.x, this.y, this.angle));
+      Game.get().projectiles.push(new Projectile(x, y, this.angle));
     } else {
       const angleOffset = 0.3;
       Game.get().projectiles.push(
-        new Projectile(this.x, this.y, this.angle - 2 * angleOffset),
-        new Projectile(this.x, this.y, this.angle - angleOffset),
-        new Projectile(this.x, this.y, this.angle),
-        new Projectile(this.x, this.y, this.angle + angleOffset),
-        new Projectile(this.x, this.y, this.angle + 2 * angleOffset),
+        new Projectile(x, y, this.angle - 2 * angleOffset),
+        new Projectile(x, y, this.angle - angleOffset),
+        new Projectile(x, y, this.angle),
+        new Projectile(x, y, this.angle + angleOffset),
+        new Projectile(x, y, this.angle + 2 * angleOffset),
       );
     }
   }
@@ -222,7 +227,7 @@ export class Laser extends AnimatedObject {
     const laserWidth = this.player.isWeaponUpgraded() ? 30 : 10;
     ctx.drawImage(
       Images.LASER,
-      -5,   // No clue why, but need this to center the laser
+      - laserWidth / 2,
       this.player.size,
       laserWidth,
       - this.player.size + laserLength,

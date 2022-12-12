@@ -63,7 +63,7 @@ export default class Images {
       Images.PLAYER_LIFE,
       Images.BLACK_BACKGROUND,
       Images.POWERUP_RED_STAR,
-      Images.POWERUP_YELLOW_BOLT
+      Images.POWERUP_YELLOW_BOLT,
     ] = await Promise.all([
       loadImage(shipImage),
       loadImage(projectileImage),
@@ -81,7 +81,7 @@ export default class Images {
       loadImage(playerLifeImage),
       loadImage(blackBackgroundImage),
       loadImage(powerupRedStarImage),
-      loadImage(powerupYellowBoltImage)
+      loadImage(powerupYellowBoltImage),
     ]);
   }
 }
