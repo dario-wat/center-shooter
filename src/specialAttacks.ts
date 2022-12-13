@@ -1,7 +1,7 @@
 import { Game } from "./gameState";
 import { AnimatedObject } from "./game_objects/animatedObject";
-import { CanFitLaser } from "./game_objects/canFitLaser";
-import { Laser, Player } from "./game_objects/player";
+import { CanFitLaser, Laser } from "./game_objects/laser";
+import { Player } from "./game_objects/player";
 import Images from "./images";
 
 export class ProjectileBurstAttack {
