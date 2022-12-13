@@ -51,7 +51,7 @@ async function main(): Promise<void> {
     } else if (Game.player.isProjectileEquipped()) {
       Game.player.fireProjectile();
     } else if (Game.player.isLaserEquipped()) {
-      Game.player.laser.isActive = true;
+      Game.player.laser.activate();
     }
   });
 

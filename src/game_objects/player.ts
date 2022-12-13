@@ -74,10 +74,6 @@ export class Player extends AnimatedObject implements CanFitLaser {
     return this.activeWeapon === WeaponType.PROJECTILE;
   }
 
-  isLaserFiring(): boolean {
-    return this.isLaserEquipped() && this.laser.isActive;
-  }
-
   isDead(): boolean {
     return this.lives <= 0;
   }
@@ -159,6 +155,10 @@ export class Player extends AnimatedObject implements CanFitLaser {
   getLaserAngle(): number {
     return this.angle;
   }
+
+  isLaserFiring(): boolean {
+    return this.isLaserEquipped() && this.laser.isActive;
+  }
 }
 
 export class Projectile extends AnimatedObject {
@@ -214,7 +214,7 @@ export class Projectile extends AnimatedObject {
 
 export class Laser extends AnimatedObject {
 
-  private static readonly DPS_SIZE_THRESHOLD = 300;
+  public static readonly DPS_SIZE_THRESHOLD = 300;
   private static readonly WIDTH_S = 10;
   private static readonly WIDTH_L = 30;
 
@@ -225,8 +225,24 @@ export class Laser extends AnimatedObject {
     super();
   }
 
+  activate(): void {
+    this.isActive = true;
+  }
+
+  isFiring(): boolean {
+    return this.isActive && this.canFitLaser.isLaserEquipped();
+  }
+
   getDps(): number {
     return this.canFitLaser.getLaserDps();
+  }
+
+  getPosition(): { x: number; y: number; } {
+    return this.canFitLaser.getLaserPosition();
+  }
+
+  getAngle(): number {
+    return this.canFitLaser.getLaserAngle();
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
@@ -243,7 +259,7 @@ export class Laser extends AnimatedObject {
     // Draw laser to the edge of the screen or to the hit point
     const laserLength = this.hit
       ? euclDistance(this.hit.x, this.hit.y, position.x, position.y)
-      : 1000;
+      : 2000;
     const laserWidth = this.getDps() > Laser.DPS_SIZE_THRESHOLD
       ? Laser.WIDTH_L
       : Laser.WIDTH_S;
@@ -277,13 +293,13 @@ export class LaserHit extends AnimatedObject {
   constructor(
     public x: number,
     public y: number,
-    private player: Player,
+    private laser: Laser,
   ) {
     super();
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
-    const size = this.player.isWeaponUpgraded()
+    const size = this.laser.getDps() > Laser.DPS_SIZE_THRESHOLD
       ? LaserHit.UPGRADED_SIZE
       : LaserHit.SIZE;
     ctx.drawImage(

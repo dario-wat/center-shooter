@@ -7,4 +7,6 @@ export interface CanFitLaser {
   getLaserPosition(): { x: number, y: number };
 
   getLaserAngle(): number;
+
+  isLaserEquipped(): boolean;
 }

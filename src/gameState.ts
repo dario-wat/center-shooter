@@ -167,7 +167,7 @@ function spawn(): void {
 function collision(dt: number): void {
   collidePlayerWithMeteors();
   collideProjectilesAndMeteors();
-  collideLaserWithMeteors(dt);
+  collideLaserWithMeteors(Game.player.laser, dt);
 }
 
 export function runGameLoop(): void {

@@ -1,6 +1,6 @@
 import { Game } from "./gameState";
 import { Meteor, Smoke } from "./game_objects/gameObjects";
-import { LaserHit, Projectile } from "./game_objects/player";
+import { Laser, LaserHit, Projectile } from "./game_objects/player";
 import { arrayCrossProduct, euclDistance, intersectRayAndCircle } from "./util";
 
 export function collidePlayerWithMeteors(): void {
@@ -48,22 +48,23 @@ export function collideProjectilesAndMeteors(): void {
   });
 }
 
-export function collideLaserWithMeteors(dt: number): void {
+export function collideLaserWithMeteors(laser: Laser, dt: number): void {
   // Collision between laser and meteors
-  Game.player.laser.hit = null;
+  laser.hit = null;
   let distanceToMeteor = Infinity;
   let meteorToHit: Meteor | null = null;
-  if (Game.player.isLaserFiring()) {
+  if (laser.isFiring()) {
     Game.meteors.forEach(meteor => {
+      const position = laser.getPosition();
       // Circle and line intersection
       const intersection = intersectRayAndCircle(
-        Game.player.x, Game.player.y, Game.player.angle,
+        position.x, position.y, laser.getAngle(),
         meteor.x, meteor.y, meteor.size(),
       );
       if (intersection !== null) {
-        const distance = euclDistance(Game.player.x, Game.player.y, intersection.x, intersection.y);
+        const distance = euclDistance(position.x, position.y, intersection.x, intersection.y);
         if (distance < distanceToMeteor) {
-          Game.player.laser.hit = new LaserHit(intersection.x, intersection.y, Game.player);
+          laser.hit = new LaserHit(intersection.x, intersection.y, laser);
           distanceToMeteor = distance;
           meteorToHit = meteor;
         }
