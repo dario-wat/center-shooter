@@ -2,6 +2,8 @@ import Images from "../images";
 import { euclDistance } from "../util";
 import { AnimatedObject } from "./animatedObject";
 
+const DPS_SIZE_THRESHOLD = 300;
+
 export interface CanFitLaser {
 
   getLaserDps(): number;
@@ -15,7 +17,6 @@ export interface CanFitLaser {
 
 export class Laser extends AnimatedObject {
 
-  public static readonly DPS_SIZE_THRESHOLD = 300;
   private static readonly WIDTH_S = 10;
   private static readonly WIDTH_L = 30;
 
@@ -61,7 +62,7 @@ export class Laser extends AnimatedObject {
     const laserLength = this.hit
       ? euclDistance(this.hit.x, this.hit.y, position.x, position.y)
       : 2000;
-    const laserWidth = this.getDps() > Laser.DPS_SIZE_THRESHOLD
+    const laserWidth = this.getDps() > DPS_SIZE_THRESHOLD
       ? Laser.WIDTH_L
       : Laser.WIDTH_S;
 
@@ -100,7 +101,7 @@ export class LaserHit extends AnimatedObject {
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
-    const size = this.laser.getDps() > Laser.DPS_SIZE_THRESHOLD
+    const size = this.laser.getDps() > DPS_SIZE_THRESHOLD
       ? LaserHit.UPGRADED_SIZE
       : LaserHit.SIZE;
     ctx.drawImage(

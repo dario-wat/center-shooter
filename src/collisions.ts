@@ -1,7 +1,7 @@
 import { Game } from "./gameState";
 import { Meteor, Smoke } from "./game_objects/gameObjects";
 import { Laser, LaserHit } from "./game_objects/laser";
-import { Projectile } from "./game_objects/player";
+import { Projectile } from "./game_objects/projectile";
 import { arrayCrossProduct, euclDistance, intersectRayAndCircle } from "./util";
 
 export function collidePlayerWithMeteors(): void {
