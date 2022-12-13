@@ -49,7 +49,9 @@ export class RocketLaser extends AnimatedObject implements CanFitLaser {
   public x: number;
   public y: number;
   private isLeft: boolean;
-  private laser: Laser;
+
+  // Game objects
+  public laser: Laser;
 
   constructor() {
     super();

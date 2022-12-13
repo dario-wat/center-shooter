@@ -69,8 +69,8 @@ export function intersectRayAndCircle(
   circleY: number,
   circleRadius: number,
 ): { x: number, y: number } | null {
-  const lineEndX = lineStartX + 1000 * Math.cos(lineAngle);
-  const lineEndY = lineStartY + 1000 * Math.sin(lineAngle);
+  const lineEndX = lineStartX + 10000 * Math.cos(lineAngle);
+  const lineEndY = lineStartY + 10000 * Math.sin(lineAngle);
 
   const a = lineEndX - lineStartX;
   const b = lineStartX - circleX;

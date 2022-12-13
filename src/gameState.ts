@@ -169,6 +169,9 @@ function collision(dt: number): void {
   collidePlayerWithMeteors();
   collideProjectilesAndMeteors();
   collideLaserWithMeteors(Game.player.laser, dt);
+  if (Game.rocketLaser !== null) {
+    collideLaserWithMeteors(Game.rocketLaser.laser, dt);
+  }
 }
 
 export function runGameLoop(): void {
