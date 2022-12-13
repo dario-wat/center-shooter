@@ -3,7 +3,7 @@ import { LaserHit, Player, Projectile } from './game_objects/player';
 import { MeteorSpawner } from './spawners/meteorSpawner';
 import { arrayCrossProduct, drawRoundRect, euclDistance, intersectRayAndCircle } from './util';
 import Images from './images';
-import { ProjectileBurstAttack } from './specialAttacks';
+import { ProjectileBurstAttack, RocketLaser } from './specialAttacks';
 import { PowerupSpawner } from './spawners/powerupSpawner';
 import { drawDifficultyMultiplier, drawEquippedWeapon, drawLives, drawProjectileBurstPower, drawScore, drawWeaponUpgradeRemainingTime } from './drawHud';
 import { collideLaserWithMeteors, collidePlayerWithMeteors, collideProjectilesAndMeteors } from './collisions';
@@ -32,7 +32,7 @@ export abstract class Game {
   public static smokes: Smoke[] = [];
   public static projectileBurstPowerup: ProjectileBurstPowerup | null = null;
   public static weaponUpgradePowerup: WeaponUpgradePowerup | null = null;
-
+  public static rocketLaser: RocketLaser | null = null;
 }
 
 export function initGame(): void {
@@ -61,6 +61,7 @@ function draw(): void {
   Game.player.draw(Game.ctx);
   Game.projectileBurstPowerup?.draw(Game.ctx);
   Game.weaponUpgradePowerup?.draw(Game.ctx);
+  Game.rocketLaser?.draw(Game.ctx);
 
   const uiXOffset = 20;
   const uiYOffset = 40;
@@ -111,6 +112,7 @@ function update(dt: number): void {
   Game.smokes.forEach(smoke => smoke.update(dt));
   Game.projectileBurstPowerup?.update(dt);
   Game.weaponUpgradePowerup?.update(dt);
+  Game.rocketLaser?.update(dt);
 }
 
 function isOffScreen(x: number, y: number, size: number): boolean {
@@ -138,6 +140,13 @@ function cleanup(): void {
   // Cleanup projectile burst
   if (Game.projectileBurstAttack?.isDone()) {
     Game.projectileBurstAttack = null;
+  }
+
+  if (
+    Game.rocketLaser !== null
+    && isOffScreen(Game.rocketLaser.x, Game.rocketLaser.y, RocketLaser.LENGTH)
+  ) {
+    Game.rocketLaser = null;
   }
 }
 

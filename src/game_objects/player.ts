@@ -3,16 +3,20 @@ import Images from '../images';
 import { DEBUG_COLLISIONS, INVINCIBILITY } from '../config';
 import { AnimatedObject } from './animatedObject';
 import { Game } from '../gameState';
+import { CanFitLaser } from './canFitLaser';
 
 enum WeaponType {
   LASER,
   PROJECTILE,
 }
 
-export class Player extends AnimatedObject {
+export class Player extends AnimatedObject implements CanFitLaser {
 
   private static readonly INVINCIBILITY_DURATION = 2000;
   private static readonly WEAPON_UPGRADE_TIME = 10000;
+
+  public static readonly LASER_DPS = 180;
+  public static readonly LASER_UPGRADED_DPS = 360;
 
   private activeWeapon: WeaponType = WeaponType.PROJECTILE;
   public weaponUpgradeStartTime: number = 0;
@@ -143,6 +147,18 @@ export class Player extends AnimatedObject {
   upgradeWeapon(): void {
     this.weaponUpgradeStartTime = Date.now();
   }
+
+  getLaserDps(): number {
+    return this.isWeaponUpgraded() ? Player.LASER_UPGRADED_DPS : Player.LASER_DPS;
+  }
+
+  getLaserPosition(): { x: number; y: number; } {
+    return { x: this.x, y: this.y };
+  }
+
+  getLaserAngle(): number {
+    return this.angle;
+  }
 }
 
 export class Projectile extends AnimatedObject {
@@ -198,18 +214,19 @@ export class Projectile extends AnimatedObject {
 
 export class Laser extends AnimatedObject {
 
-  public static readonly DPS = 180;
-  public static readonly UPGRADED_DPS = 360;
+  private static readonly DPS_SIZE_THRESHOLD = 300;
+  private static readonly WIDTH_S = 10;
+  private static readonly WIDTH_L = 30;
 
   public isActive: boolean = false;
   public hit: LaserHit | null = null;
 
-  constructor(private player: Player) {
+  constructor(private canFitLaser: CanFitLaser) {
     super();
   }
 
   getDps(): number {
-    return this.player.isWeaponUpgraded() ? Laser.UPGRADED_DPS : Laser.DPS;
+    return this.canFitLaser.getLaserDps();
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
@@ -217,24 +234,31 @@ export class Laser extends AnimatedObject {
       return;
     }
 
-    ctx.translate(this.player.x, this.player.y);
-    ctx.rotate(this.player.angle - Math.PI / 2);
+    const position = this.canFitLaser.getLaserPosition();
+    const angle = this.canFitLaser.getLaserAngle();
+
+    ctx.translate(position.x, position.y);
+    ctx.rotate(angle - Math.PI / 2);
 
     // Draw laser to the edge of the screen or to the hit point
     const laserLength = this.hit
-      ? euclDistance(this.hit.x, this.hit.y, this.player.x, this.player.y)
+      ? euclDistance(this.hit.x, this.hit.y, position.x, position.y)
       : 1000;
-    const laserWidth = this.player.isWeaponUpgraded() ? 30 : 10;
+    const laserWidth = this.getDps() > Laser.DPS_SIZE_THRESHOLD
+      ? Laser.WIDTH_L
+      : Laser.WIDTH_S;
+
+    // TODO need laser offset
     ctx.drawImage(
       Images.LASER,
       - laserWidth / 2,
-      this.player.size,
+      0,
       laserWidth,
-      - this.player.size + laserLength,
+      laserLength,
     );
 
-    ctx.rotate(-this.player.angle + Math.PI / 2);
-    ctx.translate(-this.player.x, -this.player.y);
+    ctx.rotate(-angle + Math.PI / 2);
+    ctx.translate(-position.x, -position.y);
 
     this.hit?.draw(ctx);
   }

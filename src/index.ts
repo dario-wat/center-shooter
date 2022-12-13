@@ -1,6 +1,6 @@
 import { euclDistance } from './util';
 import Images from './images';
-import { ProjectileBurstAttack } from './specialAttacks';
+import { ProjectileBurstAttack, RocketLaser } from './specialAttacks';
 import { Game, initGame, runGameLoop } from './gameState';
 
 
@@ -44,7 +44,10 @@ async function main(): Promise<void> {
       ) < Game.projectileBurstPowerup.size
     ) {
       Game.projectileBurstPowerup = null;
-      Game.projectileBurstAttack = new ProjectileBurstAttack(Game.player);
+      // TODO
+      // new powerup for the rocket
+      // Game.projectileBurstAttack = new ProjectileBurstAttack(Game.player);
+      Game.rocketLaser = new RocketLaser();
     } else if (Game.player.isProjectileEquipped()) {
       Game.player.fireProjectile();
     } else if (Game.player.isLaserEquipped()) {

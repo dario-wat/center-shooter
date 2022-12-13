@@ -15,6 +15,7 @@ import playerLifeImage from '../assets/playerLife2_red.png';
 import blackBackgroundImage from '../assets/black.png';
 import powerupRedStarImage from '../assets/powerupRed_star.png';
 import powerupYellowBoltImage from '../assets/powerupYellow_bolt.png';
+import rocketImage from '../assets/spaceRockets_001.png';
 
 async function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -44,6 +45,7 @@ export default class Images {
   public static BLACK_BACKGROUND: HTMLImageElement;
   public static POWERUP_RED_STAR: HTMLImageElement;
   public static POWERUP_YELLOW_BOLT: HTMLImageElement;
+  public static ROCKET: HTMLImageElement;
 
   public static async initialize(): Promise<void> {
     [
@@ -64,6 +66,7 @@ export default class Images {
       Images.BLACK_BACKGROUND,
       Images.POWERUP_RED_STAR,
       Images.POWERUP_YELLOW_BOLT,
+      Images.ROCKET,
     ] = await Promise.all([
       loadImage(shipImage),
       loadImage(projectileImage),
@@ -82,6 +85,7 @@ export default class Images {
       loadImage(blackBackgroundImage),
       loadImage(powerupRedStarImage),
       loadImage(powerupYellowBoltImage),
+      loadImage(rocketImage),
     ]);
   }
 }
