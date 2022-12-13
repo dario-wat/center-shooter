@@ -1,5 +1,5 @@
 import { Game } from '../gameState';
-import { Meteor } from '../game_objects/gameObjects';
+import { Meteor } from '../game_objects/meteor';
 import { Player } from '../game_objects/player';
 
 const MIN_INTERVAL = 500;

@@ -1,7 +1,7 @@
 import { FORCE_POWERUP } from "../config";
 import { Game } from "../gameState";
-import { ProjectileBurstPowerup, WeaponUpgradePowerup } from "../game_objects/gameObjects";
 import { Player } from "../game_objects/player";
+import { ProjectileBurstPowerup, WeaponUpgradePowerup } from "../game_objects/powerUps";
 import { euclDistance } from "../util";
 
 export class PowerupSpawner {

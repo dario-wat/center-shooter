@@ -1,4 +1,4 @@
-import { Meteor, ProjectileBurstPowerup, Smoke, WeaponUpgradePowerup } from './game_objects/gameObjects';
+import { Meteor, Smoke } from './game_objects/meteor';
 import { Player } from './game_objects/player';
 import { MeteorSpawner } from './spawners/meteorSpawner';
 import { arrayCrossProduct, drawRoundRect, euclDistance, intersectRayAndCircle } from './util';
@@ -9,6 +9,7 @@ import { drawDifficultyMultiplier, drawEquippedWeapon, drawLives, drawProjectile
 import { collideLaserWithMeteors, collidePlayerWithMeteors, collideProjectilesAndMeteors } from './collisions';
 import { DEBUG_DIFFICULTY } from './config';
 import { Projectile } from './game_objects/projectile';
+import { ProjectileBurstPowerup, WeaponUpgradePowerup } from './game_objects/powerUps';
 
 export abstract class Game {
 

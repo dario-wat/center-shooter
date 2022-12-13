@@ -12,3 +12,6 @@
 [x] Fix scoring
 [] Another special attack
 [] More intelligent enemies
+[] Make collisions better
+[] Deal with inputs
+[] Add a powerup for the new special attack

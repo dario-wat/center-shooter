@@ -1,5 +1,5 @@
 import { Game } from "./gameState";
-import { Meteor, Smoke } from "./game_objects/gameObjects";
+import { Meteor, Smoke } from "./game_objects/meteor";
 import { Laser, LaserHit } from "./game_objects/laser";
 import { Projectile } from "./game_objects/projectile";
 import { arrayCrossProduct, euclDistance, intersectRayAndCircle } from "./util";

@@ -69,9 +69,7 @@ async function main(): Promise<void> {
   // Change weapon on scroll
   Game.canvas.addEventListener('wheel', (event) => {
     event.preventDefault();
-    if (event.deltaY > 0) {
-      Game.player.changeWeapon();
-    }
+    Game.player.changeWeapon();
   });
 
   runGameLoop();
