@@ -44,9 +44,16 @@ async function main(): Promise<void> {
       ) < Game.projectileBurstPowerup.size
     ) {
       Game.projectileBurstPowerup = null;
-      // TODO
-      // new powerup for the rocket
-      // Game.projectileBurstAttack = new ProjectileBurstAttack(Game.player);
+      Game.projectileBurstAttack = new ProjectileBurstAttack(Game.player);
+    } else if (Game.rocketLaserPowerup
+      && euclDistance(
+        Game.rocketLaserPowerup.x,
+        Game.rocketLaserPowerup.y,
+        event.clientX,
+        event.clientY
+      ) < Game.rocketLaserPowerup.size
+    ) {
+      Game.rocketLaserPowerup = null;
       Game.rocketLaser = new RocketLaser();
     } else if (Game.player.isProjectileEquipped()) {
       Game.player.fireProjectile();
@@ -63,7 +70,8 @@ async function main(): Promise<void> {
   // Change weapon on right click
   Game.canvas.addEventListener('contextmenu', (event) => {
     event.preventDefault();
-    Game.projectileBurstAttack.activate();
+    // Game.projectileBurstAttack.activate();
+    Game.rocketLaser.activate();
   });
 
   // Change weapon on scroll

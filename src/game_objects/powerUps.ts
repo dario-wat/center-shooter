@@ -53,3 +53,8 @@ export class WeaponUpgradePowerup extends Powerup {
 
   readonly image = Images.POWERUP_YELLOW_BOLT;
 }
+
+export class RocketLaserPowerup extends Powerup {
+
+  readonly image = Images.POWERUP_BLUE_STAR;
+}

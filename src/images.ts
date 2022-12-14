@@ -14,6 +14,7 @@ import laserHitImage from '../assets/laserRed08.png';
 import playerLifeImage from '../assets/playerLife2_red.png';
 import blackBackgroundImage from '../assets/black.png';
 import powerupRedStarImage from '../assets/powerupRed_star.png';
+import powerupBlueStarImage from '../assets/powerupBlue_star.png';
 import powerupYellowBoltImage from '../assets/powerupYellow_bolt.png';
 import rocketImage from '../assets/spaceRockets_001.png';
 
@@ -44,6 +45,7 @@ export default class Images {
   public static PLAYER_LIFE: HTMLImageElement;
   public static BLACK_BACKGROUND: HTMLImageElement;
   public static POWERUP_RED_STAR: HTMLImageElement;
+  public static POWERUP_BLUE_STAR: HTMLImageElement;
   public static POWERUP_YELLOW_BOLT: HTMLImageElement;
   public static ROCKET: HTMLImageElement;
 
@@ -65,6 +67,7 @@ export default class Images {
       Images.PLAYER_LIFE,
       Images.BLACK_BACKGROUND,
       Images.POWERUP_RED_STAR,
+      Images.POWERUP_BLUE_STAR,
       Images.POWERUP_YELLOW_BOLT,
       Images.ROCKET,
     ] = await Promise.all([
@@ -84,6 +87,7 @@ export default class Images {
       loadImage(playerLifeImage),
       loadImage(blackBackgroundImage),
       loadImage(powerupRedStarImage),
+      loadImage(powerupBlueStarImage),
       loadImage(powerupYellowBoltImage),
       loadImage(rocketImage),
     ]);

@@ -32,14 +32,15 @@ export function drawLives(
   }
 }
 
-export function drawProjectileBurstPower(
+export function drawPowerup(
   ctx: CanvasRenderingContext2D,
+  image: HTMLImageElement,
   x: number,
   y: number,
 ): void {
   const powerSize = 24;
   ctx.drawImage(
-    Images.POWERUP_RED_STAR,
+    image,
     x,
     y,
     powerSize,

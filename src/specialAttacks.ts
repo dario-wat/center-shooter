@@ -49,6 +49,7 @@ export class RocketLaser extends AnimatedObject implements CanFitLaser {
   public x: number;
   public y: number;
   private isLeft: boolean;
+  public isActive: boolean = false;
 
   // Game objects
   public laser: Laser;
@@ -61,8 +62,12 @@ export class RocketLaser extends AnimatedObject implements CanFitLaser {
     this.x = this.isLeft
       ? RocketLaser.OFFSET_X
       : Game.canvas.width - RocketLaser.OFFSET_X;
-    this.y = Game.canvas.height + RocketLaser.LENGTH / 2;
+    this.y = Game.canvas.height;
     this.laser = new Laser(this);
+  }
+
+  activate(): void {
+    this.isActive = true;
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
@@ -87,6 +92,9 @@ export class RocketLaser extends AnimatedObject implements CanFitLaser {
   }
 
   update(dt: number): void {
+    if (!this.isActive) {
+      return;
+    }
     this.x += Math.cos(RocketLaser.ANGLE) * RocketLaser.VELOCITY * dt;
     this.y += Math.sin(RocketLaser.ANGLE) * RocketLaser.VELOCITY * dt;
   }

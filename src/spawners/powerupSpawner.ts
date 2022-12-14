@@ -1,7 +1,7 @@
 import { FORCE_POWERUP } from "../config";
 import { Game } from "../gameState";
 import { Player } from "../game_objects/player";
-import { ProjectileBurstPowerup, WeaponUpgradePowerup } from "../game_objects/powerUps";
+import { ProjectileBurstPowerup, RocketLaserPowerup, WeaponUpgradePowerup } from "../game_objects/powerUps";
 import { euclDistance } from "../util";
 
 export class PowerupSpawner {
@@ -40,8 +40,17 @@ export class PowerupSpawner {
       && !this.player.isWeaponUpgraded();
   }
 
+  private shouldSpawnRocketLaser(): boolean {
+    return Game.rocketLaser === null
+      && Game.rocketLaserPowerup === null;
+  }
+
   shouldSpawn(): boolean {
-    return (this.shouldSpawnProjectileBurst() || this.shouldSpawnWeaponUpgrade())
+    return (
+      this.shouldSpawnProjectileBurst()
+      || this.shouldSpawnWeaponUpgrade()
+      || this.shouldSpawnRocketLaser()
+    )
       && (
         FORCE_POWERUP
         || Date.now() - this.lastSpawnTimestamp > this.nextSpawnInterval
@@ -64,19 +73,16 @@ export class PowerupSpawner {
       }
     }
 
-    if (!this.shouldSpawnProjectileBurst()) {
-      Game.weaponUpgradePowerup = new WeaponUpgradePowerup(x, y);
-      return;
-    }
-    if (!this.shouldSpawnWeaponUpgrade()) {
+    // Randomly choose powerup
+    // This logic is not that great, but it works
+    const powerupChance = 0.33;
+    const powerup = Math.random();
+    if (this.shouldSpawnProjectileBurst() && powerup < powerupChance) {
       Game.projectileBurstPowerup = new ProjectileBurstPowerup(x, y);
-      return;
-    }
-
-    if (Math.random() < 0.5) {
-      Game.projectileBurstPowerup = new ProjectileBurstPowerup(x, y);
-    } else {
+    } else if (this.shouldSpawnWeaponUpgrade() && powerup < powerupChance * 2) {
       Game.weaponUpgradePowerup = new WeaponUpgradePowerup(x, y);
+    } else if (this.shouldSpawnRocketLaser()) {
+      Game.rocketLaserPowerup = new RocketLaserPowerup(x, y);
     }
   }
 }

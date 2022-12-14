@@ -5,11 +5,11 @@ import { arrayCrossProduct, drawRoundRect, euclDistance, intersectRayAndCircle }
 import Images from './images';
 import { ProjectileBurstAttack, RocketLaser } from './specialAttacks';
 import { PowerupSpawner } from './spawners/powerupSpawner';
-import { drawDifficultyMultiplier, drawEquippedWeapon, drawLives, drawProjectileBurstPower, drawScore, drawWeaponUpgradeRemainingTime } from './drawHud';
+import { drawDifficultyMultiplier, drawEquippedWeapon, drawLives, drawPowerup, drawScore, drawWeaponUpgradeRemainingTime } from './drawHud';
 import { collideLaserWithMeteors, collidePlayerWithMeteors, collideProjectilesAndMeteors } from './collisions';
 import { DEBUG_DIFFICULTY } from './config';
 import { Projectile } from './game_objects/projectile';
-import { ProjectileBurstPowerup, WeaponUpgradePowerup } from './game_objects/powerUps';
+import { ProjectileBurstPowerup, RocketLaserPowerup, WeaponUpgradePowerup } from './game_objects/powerUps';
 
 export abstract class Game {
 
@@ -33,6 +33,7 @@ export abstract class Game {
   public static meteors: Meteor[] = [];
   public static smokes: Smoke[] = [];
   public static projectileBurstPowerup: ProjectileBurstPowerup | null = null;
+  public static rocketLaserPowerup: RocketLaserPowerup | null = null;
   public static weaponUpgradePowerup: WeaponUpgradePowerup | null = null;
   public static rocketLaser: RocketLaser | null = null;
 }
@@ -62,6 +63,7 @@ function draw(): void {
   Game.smokes.forEach(smoke => smoke.draw(Game.ctx));
   Game.player.draw(Game.ctx);
   Game.projectileBurstPowerup?.draw(Game.ctx);
+  Game.rocketLaserPowerup?.draw(Game.ctx);
   Game.weaponUpgradePowerup?.draw(Game.ctx);
   Game.rocketLaser?.draw(Game.ctx);
 
@@ -82,7 +84,16 @@ function draw(): void {
     && !Game.projectileBurstAttack.isActive
   ) {
     const powerY = 110;
-    drawProjectileBurstPower(Game.ctx, uiXOffset, uiYOffset + powerY);
+    drawPowerup(Game.ctx, Images.POWERUP_RED_STAR, uiXOffset, uiYOffset + powerY);
+  }
+
+  if (
+    Game.rocketLaser !== null
+    && !Game.rocketLaser.isActive
+  ) {
+    const powerY = 110;
+    const powerX = 40;
+    drawPowerup(Game.ctx, Images.POWERUP_BLUE_STAR, uiXOffset + powerX, uiYOffset + powerY);
   }
 
   // Draw weapon upgrade remaining time
@@ -113,6 +124,7 @@ function update(dt: number): void {
   Game.meteors.forEach(meteor => meteor.update(dt));
   Game.smokes.forEach(smoke => smoke.update(dt));
   Game.projectileBurstPowerup?.update(dt);
+  Game.rocketLaserPowerup?.update(dt);
   Game.weaponUpgradePowerup?.update(dt);
   Game.rocketLaser?.update(dt);
 }
