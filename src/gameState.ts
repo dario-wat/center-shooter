@@ -46,6 +46,31 @@ export function initCanvas(): void {
   Game.ctx = Game.canvas.getContext('2d')!;
 }
 
+export function shakeScreen(): void {
+  const shakeMagnitude = 10;
+  const shakeDuration = 200;
+
+  const startTime = Date.now();
+  const endTime = startTime + shakeDuration;
+
+  let x = 0;
+  let y = 0;
+
+  const shakeInterval = setInterval(() => {
+    Game.ctx.translate(-x, -y);
+    const currentTime = Date.now();
+    if (currentTime >= endTime) {
+      clearInterval(shakeInterval);
+      return;
+    }
+
+    x = Math.random() * shakeMagnitude * 2 - shakeMagnitude;
+    y = Math.random() * shakeMagnitude * 2 - shakeMagnitude;
+
+    Game.ctx.translate(x, y);
+  }, 10);
+}
+
 export function initGame(): void {
   // I kinda regret making this static now, should've stayed with the singleton pattern
   Game.player = new Player(Game.canvas.width / 2, Game.canvas.height / 2);

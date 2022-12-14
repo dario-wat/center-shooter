@@ -2,7 +2,7 @@ import { drawCircle } from '../util';
 import Images from '../images';
 import { DEBUG_COLLISIONS, INVINCIBILITY } from '../config';
 import { AnimatedObject } from './animatedObject';
-import { Game } from '../gameState';
+import { Game, shakeScreen } from '../gameState';
 import { CanFitLaser, Laser } from './laser';
 import { Projectile } from './projectile';
 
@@ -103,6 +103,8 @@ export class Player extends AnimatedObject implements CanFitLaser {
     }
     this.lives--;
     this.lastHitTimestamp = Date.now();
+
+    shakeScreen();
   }
 
   // Spawns new projectile in the direction where the player is facing
