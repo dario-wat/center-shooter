@@ -1,13 +1,11 @@
 import { Meteor, Smoke } from './game_objects/meteor';
 import { Player } from './game_objects/player';
 import { MeteorSpawner } from './spawners/meteorSpawner';
-import { arrayCrossProduct, drawRoundRect, euclDistance, intersectRayAndCircle } from './util';
 import Images from './images';
 import { ProjectileBurstAttack, RocketLaser } from './specialAttacks';
 import { PowerupSpawner } from './spawners/powerupSpawner';
-import { drawDifficultyMultiplier, drawEquippedWeapon, drawLives, drawPowerup, drawScore, drawWeaponUpgradeRemainingTime } from './drawHud';
+import { drawHud } from './drawHud';
 import { collideLaserWithMeteors, collidePlayerWithMeteors, collideProjectilesAndMeteors } from './collisions';
-import { DEBUG_DIFFICULTY } from './config';
 import { Projectile } from './game_objects/projectile';
 import { ProjectileBurstPowerup, RocketLaserPowerup, WeaponUpgradePowerup } from './game_objects/powerUps';
 
@@ -38,13 +36,15 @@ export abstract class Game {
   public static rocketLaser: RocketLaser | null = null;
 }
 
-export function initGame(): void {
+export function initCanvas(): void {
   // Create canvas
   Game.canvas = document.getElementById('canvas') as HTMLCanvasElement;
   Game.canvas.width = window.innerWidth;
   Game.canvas.height = window.innerHeight;
   Game.ctx = Game.canvas.getContext('2d')!;
+}
 
+export function initGame(): void {
   Game.player = new Player(Game.canvas.width / 2, Game.canvas.height / 2);
   Game.meteorSpawner = new MeteorSpawner(Game.canvas.width, Game.canvas.height, Game.player);
   Game.powerupSpawner = new PowerupSpawner(Game.canvas.width, Game.canvas.height, Game.player);
@@ -67,55 +67,7 @@ function draw(): void {
   Game.weaponUpgradePowerup?.draw(Game.ctx);
   Game.rocketLaser?.draw(Game.ctx);
 
-  const uiXOffset = 20;
-  const uiYOffset = 40;
-
-  drawScore(Game.ctx, uiXOffset, uiYOffset, Game.score);
-
-  const lifeY = 20;
-  drawLives(Game.ctx, uiXOffset, uiYOffset + lifeY, Game.player.lives);
-
-  const equippedWeaponY = 65;
-  drawEquippedWeapon(Game.ctx, uiXOffset, uiYOffset + equippedWeaponY, Game.player);
-
-  // Draw projectile burst power
-  if (
-    Game.projectileBurstAttack !== null
-    && !Game.projectileBurstAttack.isActive
-  ) {
-    const powerY = 110;
-    drawPowerup(Game.ctx, Images.POWERUP_RED_STAR, uiXOffset, uiYOffset + powerY);
-  }
-
-  if (
-    Game.rocketLaser !== null
-    && !Game.rocketLaser.isActive
-  ) {
-    const powerY = 110;
-    const powerX = 40;
-    drawPowerup(Game.ctx, Images.POWERUP_BLUE_STAR, uiXOffset + powerX, uiYOffset + powerY);
-  }
-
-  // Draw weapon upgrade remaining time
-  if (Game.player.isWeaponUpgraded()) {
-    const weaponUpgradeX = 180;
-    drawWeaponUpgradeRemainingTime(
-      Game.ctx,
-      uiXOffset + weaponUpgradeX,
-      uiYOffset,
-      Game.player.getWeaponUpgradeTimeLeft(),
-    );
-  }
-
-  if (DEBUG_DIFFICULTY) {
-    const difficultyMultiplierXOffset = 300;
-    drawDifficultyMultiplier(
-      Game.ctx,
-      Game.canvas.width - difficultyMultiplierXOffset,
-      uiYOffset,
-      Game.meteorSpawner.getDifficultyMultiplier(),
-    );
-  }
+  drawHud();
 }
 
 function update(dt: number): void {

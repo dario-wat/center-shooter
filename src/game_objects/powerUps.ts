@@ -1,4 +1,5 @@
 import Images from "../images";
+import { euclDistance } from "../util";
 import { AnimatedObject } from "./animatedObject";
 
 abstract class Powerup extends AnimatedObject {
@@ -16,6 +17,10 @@ abstract class Powerup extends AnimatedObject {
     public size: number = Powerup.MIN_SIZE,
   ) {
     super();
+  }
+
+  isClicked(x: number, y: number): boolean {
+    return euclDistance(this.x, this.y, x, y) < this.size
   }
 
   draw(ctx: CanvasRenderingContext2D): void {

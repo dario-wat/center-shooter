@@ -31,6 +31,10 @@ export class Laser extends AnimatedObject {
     this.isActive = true;
   }
 
+  deactivate(): void {
+    this.isActive = false;
+  }
+
   isFiring(): boolean {
     return this.isActive && this.canFitLaser.isLaserEquipped();
   }

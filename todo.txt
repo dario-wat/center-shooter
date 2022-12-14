@@ -10,8 +10,8 @@
 [x] Make game state static
 [x] Game becomes more difficult over time
 [x] Fix scoring
-[] Another special attack
+[x] Another special attack
+[x] Deal with inputs
+[x] Add a powerup for the new special attack
 [] More intelligent enemies
 [] Make collisions better
-[] Deal with inputs
-[] Add a powerup for the new special attack

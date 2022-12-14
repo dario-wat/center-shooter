@@ -92,6 +92,10 @@ export class Player extends AnimatedObject implements CanFitLaser {
     return Player.WEAPON_UPGRADE_TIME - (Date.now() - this.weaponUpgradeStartTime);
   }
 
+  faceMouse(x: number, y: number): void {
+    this.angle = Math.atan2(y - this.y, x - this.x);
+  }
+
   // Run this when player gets hit
   hit(): void {
     if (this.isInvincible()) {

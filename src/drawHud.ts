@@ -1,8 +1,9 @@
+import { DEBUG_DIFFICULTY } from "./config";
 import { Game } from "./gameState";
 import { Player } from "./game_objects/player";
 import Images from "./images";
 
-export function drawScore(
+function drawScore(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
@@ -13,7 +14,7 @@ export function drawScore(
   ctx.fillText(`Score: ${score.toFixed(0)}`, x, y);
 }
 
-export function drawLives(
+function drawLives(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
@@ -32,11 +33,11 @@ export function drawLives(
   }
 }
 
-export function drawPowerup(
+function drawPowerup(
   ctx: CanvasRenderingContext2D,
-  image: HTMLImageElement,
   x: number,
   y: number,
+  image: HTMLImageElement,
 ): void {
   const powerSize = 24;
   ctx.drawImage(
@@ -48,7 +49,7 @@ export function drawPowerup(
   );
 }
 
-export function drawWeaponUpgradeRemainingTime(
+function drawWeaponUpgradeRemainingTime(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
@@ -74,7 +75,7 @@ export function drawWeaponUpgradeRemainingTime(
   );
 }
 
-export function drawEquippedWeapon(
+function drawEquippedWeapon(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
@@ -88,7 +89,7 @@ export function drawEquippedWeapon(
   }
 }
 
-export function drawDifficultyMultiplier(
+function drawDifficultyMultiplier(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
@@ -97,4 +98,56 @@ export function drawDifficultyMultiplier(
   ctx.font = '24px Arial';
   ctx.fillStyle = 'white';
   ctx.fillText(`Difficulty: ${difficulty}`, x, y);
+}
+
+export function drawHud(): void {
+  const uiXOffset = 20;
+  const uiYOffset = 40;
+
+  drawScore(Game.ctx, uiXOffset, uiYOffset, Game.score);
+
+  const lifeY = 20;
+  drawLives(Game.ctx, uiXOffset, uiYOffset + lifeY, Game.player.lives);
+
+  const equippedWeaponY = 65;
+  drawEquippedWeapon(Game.ctx, uiXOffset, uiYOffset + equippedWeaponY, Game.player);
+
+  // Draw projectile burst power
+  if (
+    Game.projectileBurstAttack !== null
+    && !Game.projectileBurstAttack.isActive
+  ) {
+    const powerY = 110;
+    drawPowerup(Game.ctx, uiXOffset, uiYOffset + powerY, Images.POWERUP_RED_STAR);
+  }
+
+  if (
+    Game.rocketLaser !== null
+    && !Game.rocketLaser.isActive
+  ) {
+    const powerY = 110;
+    const powerX = 40;
+    drawPowerup(Game.ctx, uiXOffset + powerX, uiYOffset + powerY, Images.POWERUP_BLUE_STAR);
+  }
+
+  // Draw weapon upgrade remaining time
+  if (Game.player.isWeaponUpgraded()) {
+    const weaponUpgradeX = 180;
+    drawWeaponUpgradeRemainingTime(
+      Game.ctx,
+      uiXOffset + weaponUpgradeX,
+      uiYOffset,
+      Game.player.getWeaponUpgradeTimeLeft(),
+    );
+  }
+
+  if (DEBUG_DIFFICULTY) {
+    const difficultyMultiplierXOffset = 300;
+    drawDifficultyMultiplier(
+      Game.ctx,
+      Game.canvas.width - difficultyMultiplierXOffset,
+      uiYOffset,
+      Game.meteorSpawner.getDifficultyMultiplier(),
+    );
+  }
 }
