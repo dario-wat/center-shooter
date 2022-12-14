@@ -1,4 +1,4 @@
-import { Game } from './gameState';
+import { Game, initGame, runGameLoop } from './gameState';
 import { ProjectileBurstAttack, RocketLaser } from './specialAttacks';
 
 export function setupInputs(): void {
@@ -14,12 +14,12 @@ export function setupInputs(): void {
     if (event.button === 2) {
       return;
     }
-    // TODO
-    // if (Game.GameOver) {
-    //   Game = new Game();
-    //   Game.run();
-    //   return;
-    // }
+
+    if (Game.gameOver) {
+      initGame();
+      runGameLoop();
+      return;
+    }
 
     if (Game.weaponUpgradePowerup
       && Game.weaponUpgradePowerup.isClicked(event.clientX, event.clientY)

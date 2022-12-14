@@ -151,3 +151,41 @@ export function drawHud(): void {
     );
   }
 }
+
+export function drawGameOver(): void {
+  const centerX = Game.canvas.width / 2;
+  const centerY = Game.canvas.height / 2;
+
+  const offY = 150;
+  const width = 350;
+  const height = 150;
+  Game.ctx.drawImage(
+    Images.BUTTON_RED,
+    centerX - width / 2,
+    centerY - height / 2 - offY,
+    width,
+    height,
+  );
+
+
+  Game.ctx.fillStyle = 'black';
+  Game.ctx.font = '48px Arial';
+
+  const gameOverTextX = 45;
+  const gameOverTextY = 70;
+  Game.ctx.fillText(
+    'Game Over',
+    centerX - width / 2 + gameOverTextX,
+    centerY - height / 2 - offY + gameOverTextY,
+  );
+
+  Game.ctx.font = '24px Arial';
+
+  const restartTextX = 90;
+  const restartTextY = 110;
+  Game.ctx.fillText(
+    'Click to restart',
+    centerX - width / 2 + restartTextX,
+    centerY - height / 2 - offY + restartTextY,
+  );
+}

@@ -4,18 +4,20 @@ import { MeteorSpawner } from './spawners/meteorSpawner';
 import Images from './images';
 import { ProjectileBurstAttack, RocketLaser } from './specialAttacks';
 import { PowerupSpawner } from './spawners/powerupSpawner';
-import { drawHud } from './drawHud';
+import { drawGameOver, drawHud } from './drawHud';
 import { collideLaserWithMeteors, collidePlayerWithMeteors, collideProjectilesAndMeteors } from './collisions';
 import { Projectile } from './game_objects/projectile';
 import { ProjectileBurstPowerup, RocketLaserPowerup, WeaponUpgradePowerup } from './game_objects/powerUps';
+import { drawRoundRect } from './util';
+import { FORCE_GAME_OVER } from './config';
 
 export abstract class Game {
 
-  public static meteorSpawner: MeteorSpawner;
-  public static powerupSpawner: PowerupSpawner;
-
   public static canvas: HTMLCanvasElement;
   public static ctx: CanvasRenderingContext2D;
+
+  public static meteorSpawner: MeteorSpawner;
+  public static powerupSpawner: PowerupSpawner;
 
   public static lastTimestamp: number = 0;
 
@@ -45,9 +47,25 @@ export function initCanvas(): void {
 }
 
 export function initGame(): void {
+  // I kinda regret making this static now, should've stayed with the singleton pattern
   Game.player = new Player(Game.canvas.width / 2, Game.canvas.height / 2);
   Game.meteorSpawner = new MeteorSpawner(Game.canvas.width, Game.canvas.height, Game.player);
   Game.powerupSpawner = new PowerupSpawner(Game.canvas.width, Game.canvas.height, Game.player);
+
+  Game.lastTimestamp = 0;
+
+  Game.gameOver = false;
+  Game.score = 0;
+
+  Game.projectileBurstAttack = null;
+
+  Game.projectiles = [];
+  Game.meteors = [];
+  Game.smokes = [];
+  Game.projectileBurstPowerup = null;
+  Game.rocketLaserPowerup = null;
+  Game.weaponUpgradePowerup = null;
+  Game.rocketLaser = null;
 }
 
 function draw(): void {
@@ -140,22 +158,13 @@ function collision(dt: number): void {
 }
 
 export function runGameLoop(): void {
+  if (FORCE_GAME_OVER || Game.gameOver) {
+    draw();   // Draw one last time
+    drawGameOver();
+    return;
+  }
+
   requestAnimationFrame(runGameLoop);
-
-  // TODO
-  // if (Game.gameOver) {
-
-  //   drawRoundRect(ctx, canvas.width / 2 - 200, canvas.height / 2 - 100, 400, 200, 20);
-
-  //   ctx.font = '48px Arial';
-  //   ctx.fillStyle = 'black';
-  //   ctx.fillText('Game Over', canvas.width / 2 - 150, canvas.height / 2);
-  //   ctx.font = '24px Arial';
-  //   ctx.fillText('Click to restart', canvas.width / 2 - 100, canvas.height / 2 + 50);
-
-
-  //   return;
-  // }
 
   // Update objects
   const dt = (Date.now() - Game.lastTimestamp) / 1000;

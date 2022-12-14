@@ -17,6 +17,7 @@ import powerupRedStarImage from '../assets/powerupRed_star.png';
 import powerupBlueStarImage from '../assets/powerupBlue_star.png';
 import powerupYellowBoltImage from '../assets/powerupYellow_bolt.png';
 import rocketImage from '../assets/spaceRockets_001.png';
+import buttonRedImage from '../assets/buttonRed.png';
 
 async function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -48,6 +49,7 @@ export default class Images {
   public static POWERUP_BLUE_STAR: HTMLImageElement;
   public static POWERUP_YELLOW_BOLT: HTMLImageElement;
   public static ROCKET: HTMLImageElement;
+  public static BUTTON_RED: HTMLImageElement;
 
   public static async initialize(): Promise<void> {
     [
@@ -70,6 +72,7 @@ export default class Images {
       Images.POWERUP_BLUE_STAR,
       Images.POWERUP_YELLOW_BOLT,
       Images.ROCKET,
+      Images.BUTTON_RED,
     ] = await Promise.all([
       loadImage(shipImage),
       loadImage(projectileImage),
@@ -90,6 +93,7 @@ export default class Images {
       loadImage(powerupBlueStarImage),
       loadImage(powerupYellowBoltImage),
       loadImage(rocketImage),
+      loadImage(buttonRedImage),
     ]);
   }
 }

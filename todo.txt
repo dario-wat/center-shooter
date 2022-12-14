@@ -13,5 +13,5 @@
 [x] Another special attack
 [x] Deal with inputs
 [x] Add a powerup for the new special attack
+[x] Fix game over state
 [] More intelligent enemies
-[] Make collisions better
