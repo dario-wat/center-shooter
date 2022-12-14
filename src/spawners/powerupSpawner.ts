@@ -6,8 +6,8 @@ import { euclDistance } from "../util";
 
 export class PowerupSpawner {
 
-  private static readonly MIN_TIME_BETWEEN_SPAWNS = 15000;
-  private static readonly MAX_TIME_BETWEEN_SPAWNS = 30000;
+  private static readonly MIN_TIME_BETWEEN_SPAWNS = 10000;
+  private static readonly MAX_TIME_BETWEEN_SPAWNS = 25000;
 
   private lastSpawnTimestamp: number;
   private nextSpawnInterval: number = 0;
